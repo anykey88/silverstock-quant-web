@@ -101,12 +101,29 @@ class ValuationEngine {
     final cutoff = _cutoff(d, years);
     final vp = d.valuations.where((v) => v.date.compareTo(cutoff) >= 0).toList();
 
-    final pers = vp.map((v) => v.per).whereType<double>().where((x) => x > 0).toList();
-    final pbrs = vp.map((v) => v.pbr).whereType<double>().where((x) => x > 0).toList();
+    // 清洗極端值，否則分位數會被單一異常日拉歪。
+    //
+    // 為什麼需要：本益比是「價格 ÷ 近四季 EPS」，當 EPS 趨近 0（虧損轉盈、
+    // 一次性損失），本益比會衝到幾百甚至幾千倍。這種數字留在樣本裡，
+    // 80 百分位就會被推到荒謬的位置——實測某檔 80 百分位 = 385 倍，
+    // 反推出的「減碼價」比現價高十倍，整份報告就廢了。
+    //
+    // 上限的取法：台股本益比超過 100 倍已屬極端，150 倍留一點餘裕；
+    // 股價淨值比超過 30 倍、殖利率超過 25% 同理。
+    final pers = vp
+        .map((v) => v.per)
+        .whereType<double>()
+        .where((x) => x > 0 && x <= 150)
+        .toList();
+    final pbrs = vp
+        .map((v) => v.pbr)
+        .whereType<double>()
+        .where((x) => x > 0 && x <= 30)
+        .toList();
     final yields = vp
         .map((v) => v.yieldPct)
         .whereType<double>()
-        .where((x) => x > 0)
+        .where((x) => x > 0 && x <= 25)
         .toList();
 
     final last = d.valuations.isEmpty ? null : d.valuations.last;

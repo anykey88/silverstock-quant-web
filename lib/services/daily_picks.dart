@@ -43,6 +43,7 @@ class PickItem {
   final List<String> gates;
   final List<String> caveats;
   final String basis; // 價格區間的推算依據
+  final bool volatileEps; // 近四季 EPS 波動劇烈，區間可信度低
 
   const PickItem({
     required this.id,
@@ -72,6 +73,7 @@ class PickItem {
     required this.gates,
     required this.caveats,
     required this.basis,
+    required this.volatileEps,
   });
 
   static double? _d(dynamic v) {
@@ -111,6 +113,7 @@ class PickItem {
         gates: _ls(m['gates']),
         caveats: _ls(m['caveats']),
         basis: (m['basis'] ?? '').toString(),
+        volatileEps: m['volatileEps'] == true,
       );
 
   /// 現價相對買區的位置

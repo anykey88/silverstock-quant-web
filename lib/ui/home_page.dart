@@ -210,6 +210,11 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 'daily':
+        // 比賽版承諾「只做歷史回測」，每日名單屬於自用功能，這裡擋住
+        if (AppModeController.instance.isCompetition) {
+          _snack('每日精選屬個人自用功能，請先切到「個人自用版」。');
+          break;
+        }
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DailyPicksPage()),
         );

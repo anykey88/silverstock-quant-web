@@ -178,6 +178,7 @@ class Pick {
   final List<String> gates; // 通過了哪些門檻
   final List<String> caveats; // 失效條件
   final String basis; // 價格區間的推算依據
+  final bool volatileEps; // 近四季 EPS 是否波動劇烈（區間可信度低）
 
   Pick({
     required this.id,
@@ -208,6 +209,7 @@ class Pick {
     required this.gates,
     required this.caveats,
     required this.basis,
+    required this.volatileEps,
   });
 
   Map<String, dynamic> toJson() => {
@@ -239,6 +241,7 @@ class Pick {
         'gates': gates,
         'caveats': caveats,
         'basis': basis,
+        'volatileEps': volatileEps,
       };
 }
 
@@ -302,6 +305,24 @@ _Analysis _analyze(String sid, StockDataset d) {
   final eps = d.epsTtm;
   final div = d.annualCashDividend;
 
+  // EPS 是否處於轉折點。
+  //
+  // 為什麼要看這個：估值合理區是「歷史本益比分位 × 當期 EPS」。
+  // 這個算法成立的前提是 EPS 相對穩定。一旦 EPS 從虧損轉正、
+  // 或一季之間翻好幾倍，分母變了，歷史倍數就不再適用——
+  // 實測台塑（1301）近兩季由 -0.45 跳到 +1.67，用歷史 PE 分位反推出
+  // 「合理價 90 元、現價 74 元便宜 27%」，這個結論是假的，
+  // 因為 90 元是用一個還沒發生過的獲利水準算出來的。
+  final eq = d.quarters.where((q) => q.eps != null).toList();
+  final last4eps = eq.length >= 4
+      ? eq.sublist(eq.length - 4).map((q) => q.eps!).toList()
+      : <double>[];
+  final hasLoss = last4eps.any((e) => e <= 0);
+  final epsMax = last4eps.isEmpty ? 0.0 : last4eps.reduce((a, b) => a > b ? a : b);
+  final epsMin = last4eps.isEmpty ? 0.0 : last4eps.reduce((a, b) => a < b ? a : b);
+  final epsVolatile =
+      last4eps.length == 4 && (hasLoss || (epsMin > 0 && epsMax / epsMin > 4));
+
   // --- 價格區間 -------------------------------------------------------------
   // 這裡刻意不叫「買進區間」，叫「估值合理區」。
   //
@@ -341,6 +362,13 @@ _Analysis _analyze(String sid, StockDataset d) {
     fairHigh = ma60 * 1.04;
     basis = '季線 ±6%（估值資料不足）';
   }
+  // 合理性守門：估值反推價與現價差超過 3 倍，代表分位數仍被污染
+  // （或 EPS 單位有問題），此時改用均線法並在報告中標明。
+  if (close > 0 && (fairHigh > close * 3 || fairHigh < close / 3)) {
+    fairLow = ma60 * 0.94;
+    fairHigh = ma60 * 1.04;
+    basis = '季線 ±6%（估值反推偏離現價過大，已降級）';
+  }
   if (fairHigh <= fairLow) fairHigh = fairLow * 1.08;
   fairLow = _clamp(fairLow, low52 * 0.8, close * 1.4);
   fairHigh = _clamp(fairHigh, fairLow * 1.03, high52 * 1.15);
@@ -356,7 +384,12 @@ _Analysis _analyze(String sid, StockDataset d) {
     trimHigh = div > 0 ? div / 0.026 : high52 * 1.12;
   }
   if (trimHigh <= trimLow) trimHigh = trimLow * 1.12;
+  if (close > 0 && trimLow > close * 3) {
+    trimLow = high52;
+    trimHigh = high52 * 1.15;
+  }
   if (trimLow < fairHigh) trimLow = fairHigh;
+  if (trimHigh <= trimLow) trimHigh = trimLow * 1.12;
 
   // --- 買進評分 -------------------------------------------------------------
   final buyReasons = <String>[];
@@ -370,16 +403,43 @@ _Analysis _analyze(String sid, StockDataset d) {
   }
   if (turnoverAvg >= 3) gates.add('日均成交額 ${turnoverAvg.toStringAsFixed(1)} 億，流動性充足');
 
-  // 門檻 2：財務品質
+  // 門檻 2：財務底線
+  //
+  // 這裡刻意不用「財務檢核 ≥ 50 分」當門檻。那個分數是「通過項數 ÷ 檢查項數」，
+  // 十幾項裡只要存貨天數、負債比、自由現金流幾項不過，就掉到 40 分以下。
+  // 但那是台股製造業與代工廠的常態，不代表公司有問題——
+  // 實測拿 50 分當門檻，鴻海（33）、廣達（44）、雙鴻（44）全被誤殺，
+  // 十檔只剩兩檔，名單失去意義。
+  //
+  // 改用兩條誰都不該違反的底線；分數本身仍然計入 30% 權重，
+  // 體質差的公司自然排在後面，而不是被一票否決。
   final fs = fq.score;
-  if (fs != null && fs < 50) {
-    return _Analysis.skip('財務檢核僅 $fs 分（門檻 50），多項指標未達標');
+  final epsTtm = d.epsTtm;
+  if (epsTtm != null && epsTtm <= 0) {
+    return _Analysis.skip(
+        '近四季 EPS 合計為負（${epsTtm.toStringAsFixed(2)} 元），先不談價格');
+  }
+  // 負債比底線放寬到 85%。原本設 80%，實測會把廣達（88）、緯創（88）、
+  // 英業達（84）、和碩（86）全數剔除——但代工廠的負債主要是應付帳款與
+  // 客戶預付，屬於營運週轉而非借貸；真正該看的是有息負債，免費資料
+  // 拿不到明細，所以這裡只擋掉最極端的一群，並在報告中標明要另看現金流。
+  if (fq.debtRatio != null && fq.debtRatio! > 85) {
+    return _Analysis.skip(
+        '負債比 ${fq.debtRatio!.toStringAsFixed(0)}%，超過 85% 的底線');
   }
   if (fs != null && fs >= 70) gates.add('財務檢核 $fs 分，體質通過');
+  if (epsTtm != null && epsTtm > 0) {
+    gates.add('近四季 EPS 合計 ${epsTtm.toStringAsFixed(2)} 元，本業有獲利');
+  }
 
   // 門檻 3：不能在營收崩跌時買
+  //
+  // 金融股要排除在外。金控與銀行的「月營收」認列的是淨收益，
+  // 會隨股債評價、匯率、呆帳提存大幅跳動，跟製造業的訂單出貨完全是兩回事。
+  // 拿 -20% 去篩，等於用一把不對的尺量身高。
+  final isFin = industryContains(d.info.industry, const ['金融', '保險', '金控', '銀行']);
   final yoy = mo.threeMonthYoY ?? mo.latestYoY;
-  if (yoy != null && yoy < -20) {
+  if (!isFin && yoy != null && yoy < -20) {
     return _Analysis.skip('近 3 月營收年減 ${(-yoy).toStringAsFixed(0)}%，超過 -20% 門檻');
   }
 
@@ -396,10 +456,19 @@ _Analysis _analyze(String sid, StockDataset d) {
     }
   }
   if (perPct != null) {
-    score += (100 - perPct) / 100 * 30;
-    if (perPct <= 30) {
+    // EPS 處於轉折點時，本益比百分位的參考價值大打折扣，權重砍半
+    final valWeight = epsVolatile ? 15.0 : 30.0;
+    score += (100 - perPct) / 100 * valWeight;
+    if (perPct <= 30 && !epsVolatile) {
       buyReasons.add('本益比 ${per?.toStringAsFixed(1)} 倍，位於近 3 年 ${perPct.toStringAsFixed(0)} 百分位（相對低檔）');
+    } else if (perPct <= 30 && epsVolatile) {
+      buyReasons.add('本益比 ${per?.toStringAsFixed(1)} 倍看似便宜，但近四季盈餘波動劇烈，'
+          '低本益比可能只是分母暫時變大');
     }
+  }
+  // 估值權重被砍掉的部分，改由財務品質承接（避免總分被系統性壓低）
+  if (epsVolatile && fs != null) {
+    score += fs / 100 * 15;
   }
   if (yld != null && yld > 0) {
     score += _clamp(yld / 6, 0, 1) * 20;
@@ -408,9 +477,15 @@ _Analysis _analyze(String sid, StockDataset d) {
     }
   }
   // 動能：連續正成長月數 + 3 月均 YoY
+  // 金融股的月營收波動主要來自評價與提存，不是業務量，這裡改看 EPS 年增
   final streakScore = _clamp(mo.positiveStreak / 6, 0, 1);
   final yoyScore = yoy == null ? 0.5 : _clamp((yoy + 20) / 60, 0, 1);
-  score += (streakScore * 0.5 + yoyScore * 0.5) * 20;
+  if (isFin) {
+    final epsY = mo.epsYoY;
+    score += (epsY == null ? 0.5 : _clamp((epsY + 20) / 60, 0, 1)) * 20;
+  } else {
+    score += (streakScore * 0.5 + yoyScore * 0.5) * 20;
+  }
   if (mo.positiveStreak >= 3) {
     buyReasons.add('月營收年增率已連續 ${mo.positiveStreak} 個月為正');
   } else if (mo.positiveStreak == 0) {
@@ -435,7 +510,7 @@ _Analysis _analyze(String sid, StockDataset d) {
     tScore += 25;
     trimReasons.add('營收動能處於「${_stageLabel(mo.stage)}」，成長正在放緩');
   }
-  if (mo.positiveStreak == 0 && (mo.latestYoY ?? 0) < 0) {
+  if (!isFin && mo.positiveStreak == 0 && (mo.latestYoY ?? 0) < 0) {
     tScore += 10;
     trimReasons.add('月營收年增率已轉負（${(mo.latestYoY ?? 0).toStringAsFixed(1)}%）');
   }
@@ -487,11 +562,17 @@ _Analysis _analyze(String sid, StockDataset d) {
   if (eps == null || eps <= 0) {
     caveats.add('本益比區間推算不適用（EPS 為負或缺失），價格區間改以均線法估算，可信度較低');
   }
+  if (epsVolatile) {
+    caveats.add('近四季 EPS 波動劇烈'
+        '${hasLoss ? '（期間曾出現單季虧損）' : '（最高與最低相差 ${(epsMax / epsMin).toStringAsFixed(1)} 倍）'}，'
+        '本益比反推的價格區間可信度明顯下降，請改看股價淨值比與現金流');
+  }
   if (vp.sampleDays < 250) {
     caveats.add('估值歷史樣本僅 ${vp.sampleDays} 天，分位數的代表性不足');
   }
-  if (industryContains(d.info.industry, const ['金融', '保險'])) {
-    caveats.add('金融股不適用本益比邏輯（損益受利率與提存影響大），區間請以股價淨值比為主要參考');
+  if (isFin) {
+    caveats.add('金融股不適用一般製造業的本益比與營收邏輯（損益受利率、股債評價與提存影響大），'
+        '區間請以股價淨值比與殖利率為主要參考，營收動能已改用 EPS 年增');
   }
   if (turnoverAvg < 1) {
     caveats.add('日均成交額僅 ${turnoverAvg.toStringAsFixed(1)} 億，進出容易滑價');
@@ -528,7 +609,43 @@ _Analysis _analyze(String sid, StockDataset d) {
     gates: gates,
     caveats: caveats,
     basis: basis,
+    volatileEps: epsVolatile,
   ));
+}
+
+/// 依產業分組後輪轉展開：每輪從每個產業各取一檔。
+/// 這樣 limit = 30 時，名單仍會涵蓋十個產業，而不是前 30 檔半導體。
+List<String> _orderByIndustry(List<String> pool) {
+  final ind = <String, String>{};
+  try {
+    final m = jsonDecode(File('assets/data/stock_index.json').readAsStringSync())
+        as Map<String, dynamic>;
+    for (final r in (m['rows'] as List? ?? const [])) {
+      final a = r as List;
+      if (a.length >= 3) ind[a[0].toString()] = a[2].toString();
+    }
+  } catch (_) {
+    // 沒有索引檔就照原順序，不影響掃描正確性
+    return pool;
+  }
+  final groups = <String, List<String>>{};
+  for (final id in pool) {
+    groups.putIfAbsent(ind[id] ?? '其他', () => <String>[]).add(id);
+  }
+  final out = <String>[];
+  var round = 0;
+  while (out.length < pool.length) {
+    var added = false;
+    for (final g in groups.values) {
+      if (round < g.length) {
+        out.add(g[round]);
+        added = true;
+      }
+    }
+    if (!added) break;
+    round++;
+  }
+  return out.isEmpty ? pool : out;
 }
 
 bool industryContains(String ind, List<String> keys) =>
@@ -559,11 +676,19 @@ Future<void> main(List<String> args) async {
   final outPath = _arg(args, '--out') ?? 'assets/data/daily_picks.json';
   final limit = int.tryParse(_arg(args, '--limit') ?? '') ?? candidatePool.length;
   final delay = int.tryParse(_arg(args, '--delay') ?? '') ?? 6200;
+  // --cached-only：只處理今天已抓過的標的，完全不發新請求。
+  // 額度用完時（匿名 300 次/小時）靠這個把已有的資料算完，不必等一小時。
+  final cachedOnly = args.contains('--cached-only');
   final token = Platform.environment['FINMIND_TOKEN'];
   final cacheDir = Directory('tool/v2/cache');
 
   final pool = candidatePool.where((e) => !_etfLike.contains(e)).toSet().toList();
-  final targets = pool.take(limit).toList();
+  // 按產業輪轉排序。
+  //
+  // 為什麼要這樣：原始清單是「半導體全部 → 電子全部 → 金融全部…」，
+  // 一旦用 --limit 跑小池子（額度不夠時很常見），名單會清一色科技股。
+  // 產業集中本身就是一種風險，不該在篩選階段就被程式的預設順序決定。
+  final targets = _orderByIndustry(pool).take(limit).toList();
 
   final perStock = _dailyDatasets.length + _fundDatasets.length; // 基礎資料另計 1 次
   stdout.writeln('SilverStock v2 每日掃描');
@@ -595,11 +720,66 @@ Future<void> main(List<String> args) async {
   final picks = <Pick>[];
   final excluded = <Map<String, String>>[];
   var i = 0;
+  var tradeDate = '';
+
+  // 每 10 檔落盤一次。掃描要跑一小時以上，中途斷掉不該讓前面的成果白費，
+  // 也讓「先跑一部分、之後補齊」變得可行。
+  Future<void> flush({bool verbose = false}) async {
+    final buyTop = picks.toList()
+      ..sort((a, b) => b.buyScore.compareTo(a.buyScore));
+    final trimTop = picks.where((p) => p.trimScore >= 15).toList()
+      ..sort((a, b) => b.trimScore.compareTo(a.trimScore));
+    final payload = _buildPayload(
+      picks: picks,
+      buyTop: buyTop,
+      trimTop: trimTop,
+      excluded: excluded,
+      universe: targets.length,
+      requests: fetcher.calls,
+      tradeDate: tradeDate.isEmpty ? DateTime.now().toIso8601String().substring(0, 10) : tradeDate,
+    );
+    final f = File(outPath);
+    await f.parent.create(recursive: true);
+    await f.writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
+    if (verbose) {
+      stdout.writeln('');
+      stdout.writeln('=== 買進觀察前 10 ===');
+      for (final p in buyTop.take(10)) {
+        stdout.writeln('${p.id} ${p.name.padRight(6)} '
+            '${p.buyScore.toStringAsFixed(1).padLeft(5)} 分  '
+            '合理區 ${p.buyLow.toStringAsFixed(1)}–${p.buyHigh.toStringAsFixed(1)}  '
+            '現價 ${p.close.toStringAsFixed(1)}');
+      }
+      stdout.writeln('');
+      stdout.writeln('=== 減碼觀察前 10 ===');
+      for (final p in trimTop.take(10)) {
+        stdout.writeln('${p.id} ${p.name.padRight(6)} '
+            '${p.trimScore.toStringAsFixed(1).padLeft(5)} 分  '
+            '減碼 ${p.trimLow.toStringAsFixed(1)}–${p.trimHigh.toStringAsFixed(1)}  '
+            '現價 ${p.close.toStringAsFixed(1)}');
+      }
+      if (excluded.isNotEmpty) {
+        stdout.writeln('');
+        stdout.writeln('=== 未列入買進名單（${excluded.length} 檔）===');
+        for (final e in excluded) {
+          stdout.writeln('${e['id']} ${(e['name'] ?? '').padRight(6)} ${e['reason']}');
+        }
+      }
+      stdout.writeln('');
+      stdout.writeln('寫入 $outPath（${picks.length} 檔完成分析，'
+          '${excluded.length} 檔未列入，${fetcher.calls} 次請求）');
+    }
+  }
 
   for (final sid in targets) {
     i++;
     final stamp = DateTime.now().toIso8601String().substring(0, 10);
     final cacheFile = File('${cacheDir.path}/${sid}_$stamp.json');
+
+    if (cachedOnly && !await cacheFile.exists()) {
+      stdout.writeln('[$i/${targets.length}] $sid  (跳過，無快取)');
+      continue;
+    }
 
     // 財報：30 天內沿用快取。抽成函式是因為「當日行情快取存在但缺財報」
     // 這個情況會發生（例如先跑過一次不含財報的掃描），必須能補抓。
@@ -667,26 +847,38 @@ Future<void> main(List<String> args) async {
       stderr.writeln('  ! $sid 分析失敗: $e');
       excluded.add({'id': sid, 'name': d.info.name, 'reason': '分析失敗：$e'});
     }
+
+    if (tradeDate.isEmpty && d.bars.isNotEmpty) {
+      tradeDate = d.bars.last.date;
+    }
+    if (i % 10 == 0) await flush();
   }
   fetcher.close();
+  await flush(verbose: true);
+}
 
-  // 排序：買進與減碼各自排名，同一批資料、兩套標準
-  final buyTop = picks.toList()
-    ..sort((a, b) => b.buyScore.compareTo(a.buyScore));
-  // 減碼名單只留有實質警示的（≥15 分）。全為 0 分時寧可空著，
-  // 也不要每天硬湊 10 檔——「今天沒有該減碼的」本身就是有用的結論。
-  final trimTop = picks.where((p) => p.trimScore >= 15).toList()
-    ..sort((a, b) => b.trimScore.compareTo(a.trimScore));
-
-  final payload = {
+/// 組出要寫進 assets/data/daily_picks.json 的結構。
+/// 抽成獨立函式，是因為中途落盤和最終輸出要完全一致；
+/// 兩處各寫一份遲早會走鐘。
+Map<String, dynamic> _buildPayload({
+  required List<Pick> picks,
+  required List<Pick> buyTop,
+  required List<Pick> trimTop,
+  required List<Map<String, String>> excluded,
+  required int universe,
+  required int requests,
+  required String tradeDate,
+}) {
+  return {
     'generated_at': DateTime.now().toIso8601String(),
-    'trade_date': _latestTradeDate(picks, targets),
-    'universe': targets.length,
+    'trade_date': tradeDate,
+    'universe': universe,
+    'scanned': picks.length + excluded.length,
     'analyzed': picks.length,
-    'requests': fetcher.calls,
+    'requests': requests,
     'method': {
       'buy': '財務品質 30% + 估值分位 30% + 殖利率 20% + 營收動能 20%；'
-          '另有四道硬門檻：日均成交額 ≥ 0.5 億、財務檢核 ≥ 50 分、'
+          '另有四道硬門檻：日均成交額 ≥ 0.5 億、近四季 EPS 合計 > 0 且負債比 ≤ 85%、'
           '近 3 月營收年增 ≥ -20%、本益比百分位 ≤ 85',
       'trim': '估值分位 30% + 動能階段 25% + 營收轉負 10% + 財務 20% + '
           '距高點回落 15% + 股利衰退 10%；減碼名單不受買進門檻限制，'
@@ -702,37 +894,6 @@ Future<void> main(List<String> args) async {
     'excluded': excluded,
     'all': picks.map((p) => p.toJson()).toList(),
   };
-
-  final f = File(outPath);
-  await f.parent.create(recursive: true);
-  await f.writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
-
-  stdout.writeln('');
-  stdout.writeln('=== 買進觀察前 10 ===');
-  for (final p in buyTop.take(10)) {
-    stdout.writeln('${p.id} ${p.name.padRight(6)} '
-        '${p.buyScore.toStringAsFixed(1).padLeft(5)} 分  '
-        '合理區 ${p.buyLow.toStringAsFixed(1)}–${p.buyHigh.toStringAsFixed(1)}  '
-        '現價 ${p.close.toStringAsFixed(1)}');
-  }
-  stdout.writeln('');
-  stdout.writeln('=== 減碼觀察前 10 ===');
-  for (final p in trimTop.take(10)) {
-    stdout.writeln('${p.id} ${p.name.padRight(6)} '
-        '${p.trimScore.toStringAsFixed(1).padLeft(5)} 分  '
-        '減碼 ${p.trimLow.toStringAsFixed(1)}–${p.trimHigh.toStringAsFixed(1)}  '
-        '現價 ${p.close.toStringAsFixed(1)}');
-  }
-  if (excluded.isNotEmpty) {
-    stdout.writeln('');
-    stdout.writeln('=== 未列入買進名單（${excluded.length} 檔）===');
-    for (final e in excluded) {
-      stdout.writeln('${e['id']} ${(e['name'] ?? '').padRight(6)} ${e['reason']}');
-    }
-  }
-  stdout.writeln('');
-  stdout.writeln('寫入 $outPath（${picks.length} 檔完成分析，'
-      '${excluded.length} 檔未列入，${fetcher.calls} 次請求）');
 }
 
 String? _arg(List<String> args, String key) {
@@ -741,22 +902,3 @@ String? _arg(List<String> args, String key) {
   return args[i + 1];
 }
 
-String _latestTradeDate(List<Pick> picks, List<String> targets) {
-  // 由快取檔的日線最後一根推估；失敗就回今天
-  try {
-    for (final sid in targets) {
-      final dir = Directory('tool/v2/cache');
-      if (!dir.existsSync()) break;
-      final files = dir
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.split('/').last.startsWith('${sid}_'))
-          .toList();
-      if (files.isEmpty) continue;
-      final m = jsonDecode(files.first.readAsStringSync()) as Map;
-      final bars = (m['datasets']?['TaiwanStockPrice'] as List?) ?? const [];
-      if (bars.isNotEmpty) return bars.last['date'].toString();
-    }
-  } catch (_) {}
-  return DateTime.now().toIso8601String().substring(0, 10);
-}

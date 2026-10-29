@@ -334,11 +334,33 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(isTrim ? '減碼區間' : '估值合理區',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                color: cInkSoft)),
+                        Row(
+                          children: [
+                            Text(isTrim ? '減碼區間' : '估值合理區',
+                                style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: cInkSoft)),
+                            if (!isTrim && it.volatileEps) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isHighContrast
+                                      ? const Color(0xFF2A2400)
+                                      : const Color(0xFFFFF1CC),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: const Text('盈餘波動大・參考用',
+                                    style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF7A5A00))),
+                              ),
+                            ],
+                          ],
+                        ),
                         const SizedBox(height: 3),
                         Text(
                           '${fmtPrice(isTrim ? it.trimLow : it.buyLow)}'
@@ -406,15 +428,21 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
   }
 
   String _zoneText(PickItem it) {
+    if (it.volatileEps) {
+      // EPS 波動劇烈時，「低於合理區」不代表便宜。
+      // 那個區間的分母（EPS）本身在跳動，說「便宜 27%」是誤導。
+      return '近四季盈餘波動大，這個區間只能當參考座標，'
+          '不能用來判斷「便宜」或「貴」';
+    }
     switch (it.buyZoneState) {
       case 0:
-        return '現價已在設定的買進區間內 — 但仍要等觸發條件成立';
+        return '現價已在估值合理區內 — 但仍要等觸發條件成立';
       case 1:
-        return '現價低於買區下緣 ${(-(it.gapToBuyZone ?? 0)).toStringAsFixed(1)}%'
+        return '現價低於合理區下緣 ${(-(it.gapToBuyZone ?? 0)).toStringAsFixed(1)}%'
             '，需確認不是基本面轉壞才往下掉';
       default:
-        return '現價高於買區上緣 ${(it.gapToBuyZone ?? 0).toStringAsFixed(1)}%，'
-            '還沒到設定的價格';
+        return '現價高於合理區上緣 ${(it.gapToBuyZone ?? 0).toStringAsFixed(1)}%，'
+            '按歷史估值看還在偏貴的位置';
     }
   }
 
