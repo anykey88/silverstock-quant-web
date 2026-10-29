@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 import '../core/formatters.dart';
 import '../data/market_repository.dart';
+import '../services/accounts.dart';
 import '../services/paper_account.dart';
+import '../ui/accounts_page.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
 
@@ -19,7 +21,7 @@ class PaperPage extends StatefulWidget {
 
 class _PaperPageState extends State<PaperPage> {
   bool _loading = true;
-  PaperAccount _acc = PaperAccount.empty();
+  late InvestAccount _acc;
   String _side = 'buy';
   String? _stockId;
   final TextEditingController _sharesCtrl = TextEditingController(text: '1000');
@@ -28,6 +30,7 @@ class _PaperPageState extends State<PaperPage> {
   void initState() {
     super.initState();
     _stockId = widget.presetStockId;
+    _acc = AccountStore.load().active ?? AccountBook.empty().accounts.first;
     _load();
   }
 
@@ -41,7 +44,7 @@ class _PaperPageState extends State<PaperPage> {
     await MarketRepository.instance.ensureLoaded();
     if (!mounted) return;
     setState(() {
-      _acc = PaperStore.load();
+      _acc = AccountStore.load(force: true).active ?? _acc;
       _stockId ??= MarketRepository.instance.all.isNotEmpty
           ? MarketRepository.instance.all.first.id
           : null;
@@ -50,7 +53,14 @@ class _PaperPageState extends State<PaperPage> {
     _suggestShares();
   }
 
-  void _persist() => PaperStore.save(_acc);
+  void _persist() => AccountStore.persist();
+
+  /// 切換帳戶：重新載入帳冊、指向新帳戶，並依新本金重算建議股數
+  void _switchAccount(String id) {
+    AccountStore.select(id);
+    setState(() => _acc = AccountStore.load().active ?? _acc);
+    _suggestShares();
+  }
 
   /// 依本金與現價，預設一個買得起的股數（避免一開始就「現金不足」）
   void _suggestShares() {
@@ -107,6 +117,7 @@ class _PaperPageState extends State<PaperPage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               _topBar(),
+                              _accountSwitcher(),
                               _accountCard(),
                               _orderCard(),
                               _positionCard(),
@@ -138,15 +149,20 @@ class _PaperPageState extends State<PaperPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('模擬交易盤',
+                  Text('投資帳戶',
                       style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w900,
                           color: cInk)),
-                  Text('虛擬資金・與真實券商無關・資料存本機',
+                  Text('多本帳戶各自獨立・資料存本機',
                       style: TextStyle(fontSize: 12.5, color: cInkSoft)),
                 ],
               ),
+            ),
+            TextButton.icon(
+              onPressed: _openAccounts,
+              icon: const Icon(Icons.switch_account_rounded, size: 18),
+              label: const Text('管理'),
             ),
             TextButton(
               onPressed: _reset,
@@ -155,6 +171,75 @@ class _PaperPageState extends State<PaperPage> {
           ],
         ),
       );
+
+  Future<void> _openAccounts() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AccountsPage()),
+    );
+    if (!mounted) return;
+    setState(() => _acc = AccountStore.load(force: true).active ?? _acc);
+    _suggestShares();
+  }
+
+  /// 帳戶切換條：一眼看到家裡有幾本帳、現在看的是哪一本
+  /// 用 Wrap 而不是橫向 SingleChildScrollView——後者在 Flutter Web HTML
+  /// renderer 下會讓 Row 拿到無界寬度，導致 NaN pixel density 整頁白屏。
+  Widget _accountSwitcher() {
+    final book = AccountStore.load();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          for (final a in book.accounts) _acctChip(a, a.id == _acc.id),
+          OutlinedButton.icon(
+            onPressed: _openAccounts,
+            icon: const Icon(Icons.add_rounded, size: 17),
+            label: const Text('新帳戶'),
+            style: OutlinedButton.styleFrom(
+              primary: cInkSoft,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              minimumSize: const Size(0, 36),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _acctChip(InvestAccount a, bool on) {
+    final isReal = a.kind == AccountKind.real;
+    final base = isReal ? AppColors.primary : cInkSoft;
+    return InkWell(
+      borderRadius: BorderRadius.circular(30),
+      onTap: on ? null : () => _switchAccount(a.id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        decoration: BoxDecoration(
+          color: on ? base : base.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: base.withOpacity(on ? 1 : 0.28)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isReal ? Icons.account_balance_rounded : Icons.school_rounded,
+                size: 15, color: on ? Colors.white : base),
+            const SizedBox(width: 6),
+            Text(a.name,
+                style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: on ? Colors.white : base)),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _accountCard() {
     final pnl = _equity - _acc.initialCapital;
@@ -230,7 +315,9 @@ class _PaperPageState extends State<PaperPage> {
     final total = _side == 'buy' ? gross + fee : gross - fee - tax;
 
     return SectionCard(
-      title: '下單（模擬）',
+      title: _acc.kind == AccountKind.real
+          ? '記錄一筆交易・${_acc.name}'
+          : '下單（模擬）・${_acc.name}',
       icon: Icons.shopping_cart_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,24 +536,29 @@ class _PaperPageState extends State<PaperPage> {
       );
 
   Future<void> _reset() async {
+    final isReal = _acc.kind == AccountKind.real;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('重置模擬帳戶？'),
-        content: const Text('所有模擬持倉與紀錄會清空，本金回到 100 萬元。'),
+        title: Text('清空「${_acc.name}」？'),
+        content: Text(isReal
+            ? '這本帳戶的所有持倉與交易紀錄會清空，本金回到 ${money(_acc.initialCapital)} 元。\n'
+                '真實帳戶的紀錄是你自己的對帳依據，清空前建議先到「管理」匯出一份。'
+            : '所有模擬持倉與紀錄會清空，本金回到 ${money(_acc.initialCapital)} 元。'),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
               child: const Text('取消')),
           TextButton(
               onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('確定重置')),
+              child: const Text('確定清空')),
         ],
       ),
     );
     if (ok != true) return;
-    PaperStore.reset();
-    setState(() => _acc = PaperStore.load());
+    AccountStore.reset(_acc.id);
+    setState(() => _acc = AccountStore.load().active ?? _acc);
+    _suggestShares();
   }
 
   Widget _positionCard() {
@@ -499,7 +591,7 @@ class _PaperPageState extends State<PaperPage> {
                                       fontWeight: FontWeight.w800,
                                       color: cInk)),
                               Text(
-                                '$p.shares 股・成本 ${p.avgCost.toStringAsFixed(2)}'
+                                '${p.shares} 股・成本 ${p.avgCost.toStringAsFixed(2)}'
                                 '・現價 ${_priceOf(p.stockId).toStringAsFixed(2)}',
                                 style: TextStyle(
                                     fontSize: 12.5, color: cInkSoft),

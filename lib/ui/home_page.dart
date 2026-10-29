@@ -19,6 +19,7 @@ import '../services/stock_index.dart';
 import '../services/watchlist.dart';
 import '../services/strategy_store.dart';
 import '../agents/agents.dart';
+import 'accounts_page.dart';
 import 'daily_picks_page.dart';
 import 'learn_page.dart';
 import 'market_page.dart';
@@ -217,6 +218,16 @@ class _HomePageState extends State<HomePage> {
         }
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DailyPicksPage()),
+        );
+        break;
+      case 'accounts':
+        // 多帳戶記帳屬個人自用功能（涉及家人持股），比賽版不開
+        if (AppModeController.instance.isCompetition) {
+          _snack('投資帳戶屬個人自用功能，請先切到「個人自用版」。');
+          break;
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AccountsPage()),
         );
         break;
       case 'stock':
@@ -530,12 +541,12 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 10),
               Expanded(
                 child: ActionButton(
-                  label: '模擬交易盤',
-                  sub: '虛擬資金練手',
-                  icon: Icons.shopping_cart_rounded,
+                  label: '投資帳戶',
+                  sub: '多本帳・記帳與練習',
+                  icon: Icons.account_balance_wallet_rounded,
                   primary: false,
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PaperPage()),
+                    MaterialPageRoute(builder: (_) => const AccountsPage()),
                   ),
                 ),
               ),
