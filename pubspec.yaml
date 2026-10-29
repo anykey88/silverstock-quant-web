@@ -21,3 +21,5 @@ flutter:
     # 建置期由 tools/fetch_snapshot.py 自 FinMind 公開 API 取得的真實歷史資料快照。
     # 僅供本次參賽 Demo 使用；商業化必須採購 FinMind 商業授權，禁止直接把免費 API 用於售賣。
     - assets/data/snapshot.json
+    - assets/data/stock_index.json
+    - assets/data/daily_picks.json

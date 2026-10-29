@@ -21,3 +21,10 @@ Thumbs.db
 *.log
 .env
 .env.local
+
+# 掃描快取（由 CI 的 actions/cache 保存，不進版控）
+tool/v2/cache/
+tool/v2/data/
+
+# 分析產物（僅供本機檢視）
+tool/v2/*.local.json

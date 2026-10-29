@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'dart:js_util' as jsu;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../core/app_mode.dart';
 import '../core/app_settings.dart';
@@ -14,8 +15,11 @@ import '../models/trade_strategy.dart';
 import '../services/report_store.dart';
 import '../services/speech_service.dart';
 import '../services/remote_stock_service.dart';
+import '../services/stock_index.dart';
+import '../services/watchlist.dart';
 import '../services/strategy_store.dart';
 import '../agents/agents.dart';
+import 'daily_picks_page.dart';
 import 'learn_page.dart';
 import 'market_page.dart';
 import 'paper_page.dart';
@@ -49,6 +53,7 @@ class _HomePageState extends State<HomePage> {
   String _tradeStrategyId = 'preset_value';
   String? _deepView; // screener / strategies / trade
   bool _fetchingStock = false;
+  List<WatchItem> _watchItems = <WatchItem>[];
 
   @override
   void initState() {
@@ -58,11 +63,26 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _bootstrap() async {
     await MarketRepository.instance.ensureLoaded();
+    // 名稱索引（3171 檔）與自選股清單一起備好，之後搜尋零延遲
+    await StockIndex.instance.ensureLoaded();
     if (!mounted) return;
     _applyDeepLink();
     setState(() {
       _ready = true;
       _saved = ReportStore.list();
+      _watchItems = WatchList.all;
+      // 第一次使用：把內建 33 檔全部放進自選，避免空清單讓人不知道從哪開始。
+      // 先放常用那幾檔，其餘依序補上。
+      if (_watchItems.isEmpty) {
+        for (final id in kQuickPickIds) {
+          final s0 = MarketRepository.instance.series(id);
+          if (s0 != null) WatchList.addLast(id, s0.name, industry: s0.industry);
+        }
+        for (final s0 in MarketRepository.instance.all) {
+          WatchList.addLast(s0.id, s0.name, industry: s0.industry);
+        }
+        _watchItems = WatchList.all;
+      }
     });
     // 深連結可直接開啟某一份回測結果（方便分享與評審快速體驗）
     if (_autoRun) {
@@ -187,6 +207,11 @@ class _HomePageState extends State<HomePage> {
       case 'learn':
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const LearnPage()),
+        );
+        break;
+      case 'daily':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const DailyPicksPage()),
         );
         break;
       case 'stock':
@@ -457,6 +482,15 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           ActionButton(
+            label: '每日精選（買進／減碼觀察）',
+            sub: '每天收盤後掃描候選池・附估值合理區與觸發條件',
+            icon: Icons.auto_awesome_rounded,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DailyPicksPage()),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ActionButton(
             label: '市場觀察',
             sub: '大盤溫度・產業溫度・歷史條件機率',
             icon: Icons.public_rounded,
@@ -540,48 +574,75 @@ class _HomePageState extends State<HomePage> {
 
   Widget _pickStockCard() {
     final series = MarketRepository.instance.series(_stockId);
-    final total = MarketRepository.instance.all.length;
+    final watch = _watchItems;
+    final total = StockIndex.instance.count;
     return SectionCard(
       title: '① 選一檔想看的股票',
       icon: Icons.search_rounded,
-      trailing: total > 6
-          ? TextButton.icon(
-              onPressed: _pickFromAll,
-              icon: const Icon(Icons.list_rounded, size: 20),
-              label: Text('全部 $total 檔'),
-            )
-          : null,
+      trailing: TextButton.icon(
+        onPressed: _pickFromAll,
+        icon: const Icon(Icons.list_rounded, size: 20),
+        label: Text(total > 0 ? '全部 $total 檔' : '全部標的'),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              const Icon(Icons.star_rounded, size: 18, color: AppColors.gold),
+              const SizedBox(width: 6),
+              Text('我的自選股 ${watch.length}',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: cInk)),
+              const Spacer(),
+              if (watch.isNotEmpty)
+                TextButton(
+                  onPressed: _manageWatchlist,
+                  child: const Text('管理', style: TextStyle(fontSize: 13.5)),
+                ),
+            ],
+          ),
+          if (watch.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 2),
+              child: Text(
+                '自選股是空的。用下面的搜尋框輸入名稱或代號，選中後會自動加進來。',
+                style: TextStyle(fontSize: 13.5, height: 1.6, color: cInkSoft),
+              ),
+            ),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
-              for (final id in kQuickPickIds)
-                if (MarketRepository.instance.series(id) != null)
-                  ChoicePill(
-                    label: MarketRepository.instance.series(id)!.name,
-                    sub: id,
-                    selected: _stockId == id,
-                    onTap: () {
-                      setState(() {
-                        _stockId = id;
-                        _codeCtrl.clear();
-                      });
-                    },
-                  ),
+              for (final w in watch.take(18))
+                ChoicePill(
+                  label: w.name,
+                  sub: w.id,
+                  selected: _stockId == w.id,
+                  onTap: () => _selectWatch(w),
+                ),
+              if (watch.length > 18)
+                ActionChip(
+                  label: Text('還有 ${watch.length - 18} 檔'),
+                  onPressed: _manageWatchlist,
+                ),
             ],
           ),
           const SizedBox(height: 14),
           TextField(
             controller: _codeCtrl,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            decoration: const InputDecoration(
-              labelText: '或直接輸入股票代號',
-              hintText: '例如 2330、2884、0056',
-              prefixIcon: Icon(Icons.dialpad_rounded),
+            decoration: InputDecoration(
+              labelText: '輸入股票代號或名稱',
+              hintText: '例如 2330、台積、鴻海',
+              helperText: StockIndex.instance.isLoaded
+                  ? '全市場 ${StockIndex.instance.count} 檔・可只打名稱的一部分・支援簡體'
+                  : '可只打名稱的一部分，例如「台積」',
+              prefixIcon: const Icon(Icons.search_rounded),
             ),
             onSubmitted: (v) => _resolveStock(v),
           ),
@@ -641,23 +702,186 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// 輸入代號：先查本機（內建 33 檔 + 已建立的線上檔），沒有就問要不要線上建立
+  /// 統一入口：可以輸入代號，也可以輸入名稱的任何片段。
+  ///
+  /// 判斷順序刻意這樣排：
+  ///   1. 已經載入過的代號 → 直接選，零延遲
+  ///   2. 長得像代號（4–6 位數字，可帶英文字尾）→ 走線上建檔
+  ///   3. 其餘一律當名稱搜（支援簡體輸入）
+  /// 這樣「2330」不會被當成名稱去搜，「台積」也不會被誤判成代號。
   Future<void> _resolveStock(String raw) async {
-    final id = raw.trim().toUpperCase();
-    if (id.isEmpty) return;
-    final local = MarketRepository.instance.series(id);
+    final text = raw.trim();
+    if (text.isEmpty) return;
+    final upper = text.toUpperCase();
+
+    final local = MarketRepository.instance.series(upper);
     if (local != null) {
-      setState(() => _stockId = id);
+      setState(() => _stockId = upper);
       _codeCtrl.clear();
+      _noteWatched(upper, local.name, local.industry);
       _snack('已選擇 ${local.name}（${local.id}）'
-          '${MarketRepository.instance.isBuiltIn(id) ? '' : '・線上建立'}');
+          '${MarketRepository.instance.isBuiltIn(upper) ? '' : '・線上建立'}');
       return;
     }
-    if (!RegExp(r'^[0-9]{4,6}$').hasMatch(id)) {
-      _snack('請輸入 4 位數台股代號，例如 2603、2883');
+
+    if (RegExp(r'^[0-9]{4,6}[A-Z]?$').hasMatch(upper)) {
+      await _confirmAndBuild(upper, null);
       return;
     }
-    // 比賽版維持固定 33 檔（範圍可控、可重現），線上建立只在個人版開放
+
+    // 當名稱搜
+    await StockIndex.instance.ensureLoaded();
+    final hits = StockIndex.instance.search(text, limit: 30);
+    if (!mounted) return;
+    if (hits.isEmpty) {
+      _snack('找不到「$text」。可輸入 4 位數代號（例如 2330），或名稱的一部分（例如 台積、鴻海）。');
+      return;
+    }
+    if (hits.length == 1) {
+      await _selectBrief(hits.first);
+      return;
+    }
+    final picked = await _showPicker(hits, text);
+    if (picked != null && mounted) await _selectBrief(picked);
+  }
+
+  Future<void> _selectBrief(StockBrief b) async {
+    if (MarketRepository.instance.series(b.id) != null) {
+      setState(() => _stockId = b.id);
+      _codeCtrl.clear();
+      _noteWatched(b.id, b.name, b.industry);
+      _snack('已選擇 ${b.name}（${b.id}）');
+      return;
+    }
+    await _confirmAndBuild(b.id, b.name);
+  }
+
+  /// 選中即存入自選股（已存在就不重複）
+  void _noteWatched(String id, String name, String industry) {
+    if (WatchList.add(id, name, industry: industry)) {
+      setState(() => _watchItems = WatchList.all);
+    }
+  }
+
+  Future<void> _selectWatch(WatchItem w) async {
+    if (MarketRepository.instance.series(w.id) != null) {
+      setState(() => _stockId = w.id);
+      return;
+    }
+    await _confirmAndBuild(w.id, w.name);
+  }
+
+  Future<void> _manageWatchlist() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          final items = WatchList.all;
+          return SafeArea(
+            child: SizedBox(
+              height: MediaQuery.of(ctx).size.height * 0.8,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('我的自選股',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                      color: cInk)),
+                              const SizedBox(height: 2),
+                              Text('共 ${items.length} 檔・存在這台裝置',
+                                  style: TextStyle(
+                                      fontSize: 13, color: cInkSoft)),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.copy_rounded),
+                          tooltip: '複製清單',
+                          onPressed: () async {
+                            await Clipboard.setData(
+                                ClipboardData(text: WatchList.exportText()));
+                            _snack('已複製 ${items.length} 檔清單到剪貼簿');
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          onPressed: () => Navigator.of(ctx).pop(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: items.isEmpty
+                        ? Center(
+                            child: Text('還沒有自選股',
+                                style:
+                                    TextStyle(fontSize: 15, color: cInkSoft)),
+                          )
+                        : ListView.separated(
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) =>
+                                Divider(height: 1, color: cLine),
+                            itemBuilder: (_, i) {
+                              final w = items[i];
+                              final loaded =
+                                  MarketRepository.instance.series(w.id) != null;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: AppColors.gold,
+                                  child: Text('${i + 1}',
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white)),
+                                ),
+                                title: Text('${w.name}（${w.id}）',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: cInk)),
+                                subtitle: Text(
+                                    '${w.industry}${loaded ? '・已建立檔案' : '・尚未建立檔案'}',
+                                    style: TextStyle(
+                                        fontSize: 12.5, color: cInkSoft)),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline_rounded),
+                                  color: AppColors.danger,
+                                  onPressed: () {
+                                    WatchList.remove(w.id);
+                                    setSheet(() {});
+                                    setState(() => _watchItems = WatchList.all);
+                                  },
+                                ),
+                                onTap: () {
+                                  Navigator.of(ctx).pop();
+                                  _selectWatch(w);
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    if (mounted) setState(() => _watchItems = WatchList.all);
+  }
+
+  /// 詢問並建立線上檔案（原本 _resolveStock 的後半段，抽出來共用）
+  Future<void> _confirmAndBuild(String id, String? knownName) async {
     if (AppModeController.instance.isCompetition) {
       _snack('比賽合規版僅提供內建 33 檔；切到「個人自用版」可線上建立任意代號。');
       return;
@@ -666,7 +890,7 @@ class _HomePageState extends State<HomePage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('建立 $id 的檔案？'),
+        title: Text(knownName == null ? '建立 $id 的檔案？' : '建立 $knownName（$id）的檔案？'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -715,59 +939,96 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _pickFromAll() async {
-    final stocks = MarketRepository.instance.all;
-    String q = '';
-    final picked = await showModalBottomSheet<String>(
+  /// 名稱搜尋的候選清單（全市場 3000+ 檔，不是只有內建 33 檔）
+  Future<StockBrief?> _showPicker(List<StockBrief> initial, String keyword) {
+    var q = keyword;
+    var list = initial;
+    return showModalBottomSheet<StockBrief>(
       context: context,
       isScrollControlled: true,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) {
-          final list = stocks
-              .where((s) => q.isEmpty || s.id.contains(q) || s.name.contains(q))
-              .toList();
           return SafeArea(
             child: Padding(
               padding:
                   EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
               child: SizedBox(
-                height: MediaQuery.of(ctx).size.height * 0.72,
+                height: MediaQuery.of(ctx).size.height * 0.78,
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
                       child: TextField(
-                        autofocus: false,
-                        onChanged: (v) => setSheet(() => q = v.trim()),
-                        decoration: const InputDecoration(
-                          hintText: '輸入代號或名稱，例如 2330 / 台積電',
-                          prefixIcon: Icon(Icons.search_rounded),
+                        controller: TextEditingController(text: keyword),
+                        onChanged: (v) {
+                          q = v.trim();
+                          setSheet(() => list = StockIndex.instance.search(q));
+                        },
+                        style: const TextStyle(fontSize: 18),
+                        decoration: InputDecoration(
+                          hintText: '輸入代號或名稱，例如 2330 / 台積 / 台积电',
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          helperText:
+                              '全市場 ${StockIndex.instance.count} 檔・支援簡體輸入',
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: list.length,
-                        separatorBuilder: (_, __) =>
-                            Divider(height: 1, color: cLine),
-                        itemBuilder: (_, i) {
-                          final s = list[i];
-                          return ListTile(
-                            title: Text('${s.name}（${s.id}）',
-                                style: TextStyle(
-                                    fontSize: 15.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: cInk)),
-                            subtitle: Text(
-                                '${s.industry}'
-                                '${MarketRepository.instance.isBuiltIn(s.id) ? '' : '・線上建立'}',
-                                style:
-                                    TextStyle(fontSize: 12.5, color: cInkSoft)),
-                            trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () => Navigator.of(ctx).pop(s.id),
-                          );
-                        },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Text('${list.length} 筆結果',
+                              style: TextStyle(
+                                  fontSize: 13, color: cInkSoft)),
+                          const Spacer(),
+                          Text('點一下選取',
+                              style: TextStyle(
+                                  fontSize: 13, color: cInkSoft)),
+                        ],
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: list.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                  '找不到「$q」。\n試試代號（2330）或名稱的另一段字。',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15, height: 1.7, color: cInkSoft),
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              itemCount: list.length,
+                              separatorBuilder: (_, __) =>
+                                  Divider(height: 1, color: cLine),
+                              itemBuilder: (_, i) {
+                                final b = list[i];
+                                final loaded =
+                                    MarketRepository.instance.series(b.id) != null;
+                                return ListTile(
+                                  title: Text('${b.name}（${b.id}）',
+                                      style: TextStyle(
+                                          fontSize: 16.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: cInk)),
+                                  subtitle: Text(
+                                      '${b.industry}・${b.marketLabel}'
+                                      '${loaded ? '・已建立' : ''}',
+                                      style: TextStyle(
+                                          fontSize: 12.5, color: cInkSoft)),
+                                  trailing: Icon(
+                                      loaded
+                                          ? Icons.check_circle_rounded
+                                          : Icons.chevron_right_rounded,
+                                      color: loaded ? AppColors.safe : cInkSoft),
+                                  onTap: () => Navigator.of(ctx).pop(b),
+                                );
+                              },
+                            ),
                     ),
                   ],
                 ),
@@ -777,7 +1038,17 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
-    if (picked != null) setState(() => _stockId = picked);
+  }
+
+  /// 「從全部標的挑」：一開始列出已載入的標的，一打字就切換成全市場搜尋
+  Future<void> _pickFromAll() async {
+    await StockIndex.instance.ensureLoaded();
+    final initial = MarketRepository.instance.all
+        .map((x) => StockIndex.instance.byId(x.id))
+        .whereType<StockBrief>()
+        .toList();
+    final picked = await _showPicker(initial, '');
+    if (picked != null && mounted) await _selectBrief(picked);
   }
 
   Widget _conditionCard() {

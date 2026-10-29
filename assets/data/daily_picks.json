@@ -1,0 +1,17 @@
+{
+  "generated_at": "",
+  "trade_date": "",
+  "universe": 0,
+  "analyzed": 0,
+  "requests": 0,
+  "method": {
+    "buy": "尚未執行每日掃描",
+    "trim": "尚未執行每日掃描",
+    "range": "",
+    "disclaimer": "量化條件篩選結果，非投資建議"
+  },
+  "buy": [],
+  "trim": [],
+  "excluded": [],
+  "all": []
+}

@@ -1,0 +1,144 @@
+name: Daily Scan
+
+# 每個交易日收盤後（台北時間 14:30 = UTC 06:30）掃描候選池，
+# 產出 assets/data/daily_picks.json 並提交回 main。
+# main 的提交會自動觸發 deploy-pages，所以網站上的名單當天就會更新。
+
+on:
+  schedule:
+    # 週一至週五 06:30 UTC = 14:30 台北
+    - cron: '30 6 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: '只掃前 N 檔（留空掃全部）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter 3.0.0
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.0.0'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 財報快取 30 天有效、當日行情快取 1 天，用 cache 保存可省下大半請求量
+      - name: Restore scan cache
+        uses: actions/cache@v4
+        with:
+          path: tool/v2/cache
+          # 每次 run 新建 key，但用 restore-keys 繼承上一次的內容
+          key: scan-cache-${{ github.run_id }}
+          restore-keys: |
+            scan-cache-
+
+      - name: Run daily scan
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+        run: |
+          LIMIT="${{ github.event.inputs.limit }}"
+          if [ -n "$LIMIT" ]; then
+            dart run tool/v2_scan.dart --limit "$LIMIT" --delay 3000 --out assets/data/daily_picks.json
+          else
+            dart run tool/v2_scan.dart --delay 3000 --out assets/data/daily_picks.json
+          fi
+
+      - name: Commit result
+        run: |
+          git config user.name "silverstock-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add assets/data/daily_picks.json
+          if git diff --staged --quiet; then
+            echo "名單無變化，不提交"
+          else
+            git commit -m "chore(scan): 每日掃描 $(date -u '+%Y-%m-%d')"
+            git push
+          fi
+
+      # 可選：推到微信（PushPlus 免費版即可）。
+      # 在 repo secrets 設 PUSHPLUS_TOKEN 才會執行，沒設就跳過。
+      - name: Push to WeChat
+        if: always()
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: |
+          if [ -z "$PUSHPLUS_TOKEN" ]; then
+            echo "未設定 PUSHPLUS_TOKEN，跳過微信推送"
+            exit 0
+          fi
+          python3 - <<'PYEOF'
+          import json, os, urllib.request
+          d = json.load(open('assets/data/daily_picks.json'))
+          lines = [f"交易日 {d.get('trade_date','?')}・掃描 {d.get('universe',0)} 檔", ""]
+          buys = d.get('buy', [])[:5]
+          if buys:
+              lines.append("【買進觀察】")
+              for p in buys:
+                  lines.append(f"{p['name']} {p['id']}  {p['buyScore']:.0f}分  "
+                               f"合理區 {p['buyLow']:.0f}–{p['buyHigh']:.0f}  "
+                               f"現價 {p['close']:.0f}")
+          trims = d.get('trim', [])[:3]
+          if trims:
+              lines.append("")
+              lines.append("【減碼觀察】")
+              for p in trims:
+                  lines.append(f"{p['name']} {p['id']}  {p['trimScore']:.0f}分  "
+                               f"減碼區 {p['trimLow']:.0f}–{p['trimHigh']:.0f}")
+          if not buys and not trims:
+              lines.append("今天沒有標的通過門檻——這本身也是結論。")
+          lines.append("")
+          lines.append("名單為量化條件篩選，非投資建議。")
+          body = {
+              "token": os.environ["PUSHPLUS_TOKEN"],
+              "title": f"SilverStock 每日精選 {d.get('trade_date','')}",
+              "content": "<br>".join(lines),
+              "template": "html",
+          }
+          req = urllib.request.Request(
+              "https://www.pushplus.plus/send",
+              data=json.dumps(body).encode(),
+              headers={"Content-Type": "application/json"})
+          with urllib.request.urlopen(req, timeout=20) as r:
+              print(r.read().decode()[:300])
+          PYEOF
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 每日掃描結果" >> $GITHUB_STEP_SUMMARY
+          if [ -f assets/data/daily_picks.json ]; then
+            python3 - <<'EOF' >> $GITHUB_STEP_SUMMARY
+          import json
+          d = json.load(open('assets/data/daily_picks.json'))
+          print(f"- 交易日：{d.get('trade_date','?')}")
+          print(f"- 掃描 {d.get('universe',0)} 檔，{d.get('analyzed',0)} 檔通過門檻")
+          print(f"- 買進觀察 {len(d.get('buy',[]))} 檔／減碼觀察 {len(d.get('trim',[]))} 檔")
+          print("")
+          print("| 代號 | 名稱 | 分數 | 估值合理區 | 現價 |")
+          print("|---|---|---|---|---|")
+          for p in d.get('buy', [])[:10]:
+              print(f"| {p['id']} | {p['name']} | {p['buyScore']:.0f} | "
+                    f"{p['buyLow']:.1f}–{p['buyHigh']:.1f} | {p['close']:.1f} |")
+          EOF
+          else
+            echo "沒有產生名單檔" >> $GITHUB_STEP_SUMMARY
+          fi
