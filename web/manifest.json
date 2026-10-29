@@ -1,0 +1,35 @@
+{
+    "name": "SilverStock-Quant-Web 台股存股歷史回測學習工具",
+    "short_name": "SilverStock",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FBF7EF",
+    "theme_color": "#124E8C",
+    "description": "面向台胞銀髮存股族的台股多 Agent 量化研究工具：僅整理公開歷史資料並執行歷史回測，僅供學習復盤，不構成投資建議，無實盤下單功能。",
+    "orientation": "any",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

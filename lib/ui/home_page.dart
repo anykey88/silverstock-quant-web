@@ -1,0 +1,1253 @@
+// 首頁：適老化大字介面（iPad mini 8.3 吋 Safari 優先適配）
+// ignore_for_file: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'dart:js_util' as jsu;
+
+import 'package:flutter/material.dart';
+
+import '../core/app_mode.dart';
+import '../core/app_settings.dart';
+import '../core/constants.dart';
+import '../core/formatters.dart';
+import '../data/market_repository.dart';
+import '../models/trade_strategy.dart';
+import '../services/report_store.dart';
+import '../services/speech_service.dart';
+import '../services/remote_stock_service.dart';
+import '../services/strategy_store.dart';
+import '../agents/agents.dart';
+import 'learn_page.dart';
+import 'market_page.dart';
+import 'paper_page.dart';
+import 'result_page.dart';
+import 'screener_page.dart';
+import 'stock_profile_page.dart';
+import 'strategy_editor_page.dart';
+import 'strategy_page.dart';
+import 'theme.dart';
+import 'trade_result_page.dart';
+import 'widgets.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _ready = false;
+  String _stockId = '2330';
+  int _years = 5;
+  String _strategyId = 'yield_dca';
+  final TextEditingController _codeCtrl = TextEditingController();
+  final TextEditingController _queryCtrl = TextEditingController();
+  List<SavedReport> _saved = <SavedReport>[];
+  bool _autoRun = false;
+  // 個人自用版專屬
+  String _runType = 'stock'; // stock = 存股累積回測 / trade = 交易策略回測
+  String _tradeStrategyId = 'preset_value';
+  String? _deepView; // screener / strategies / trade
+  bool _fetchingStock = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    await MarketRepository.instance.ensureLoaded();
+    if (!mounted) return;
+    _applyDeepLink();
+    setState(() {
+      _ready = true;
+      _saved = ReportStore.list();
+    });
+    // 深連結可直接開啟某一份回測結果（方便分享與評審快速體驗）
+    if (_autoRun) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _run();
+      });
+    }
+    if (_deepView != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openDeepView(_deepView!);
+      });
+    }
+  }
+
+  /// 支援網址參數：
+  /// ?stock=2330&strategy=yield_dca&years=5&run=1&scale=1&contrast=0
+  void _applyDeepLink() {
+    try {
+      // Flutter Web 預設使用 hash 路由，且啟動時會改寫網址；
+      // 因此優先讀取 index.html 在啟動前保存下來的原始查詢字串。
+      var q = Uri.base.queryParameters;
+      String? boot;
+      try {
+        boot = jsu
+            .getProperty<Object?>(html.window, '__SSQ_BOOT_QUERY__')
+            ?.toString();
+      } catch (_) {}
+      final raw = (boot != null && boot.contains('?')) ? boot : Uri.base.toString();
+      final qi = raw.indexOf('?');
+      if (qi >= 0) {
+        q = Uri.parse(raw.substring(qi).replaceAll('#', '')).queryParameters;
+      }
+      final stock = q['stock'];
+      if (stock != null && MarketRepository.instance.series(stock) != null) {
+        _stockId = stock;
+      }
+      final strategy = q['strategy'];
+      if (strategy != null && kStrategies.any((e) => e.id == strategy)) {
+        _strategyId = strategy;
+      }
+      final y = int.tryParse(q['years'] ?? '');
+      if (y != null) _years = y.clamp(1, 6);
+      final sc = int.tryParse(q['scale'] ?? '');
+      if (sc != null) AppSettings.instance.setFontIndex(sc);
+      final c = q['contrast'];
+      if (c != null) AppSettings.instance.setHighContrast(c == '1');
+      _autoRun = q['run'] == '1';
+      _deepView = q['view'];
+      final ts = q['tstrategy'];
+      if (ts != null && StrategyStore.byId(ts) != null) _tradeStrategyId = ts;
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _codeCtrl.dispose();
+    _queryCtrl.dispose();
+    super.dispose();
+  }
+
+  void _snack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      duration: const Duration(seconds: 3),
+    ));
+  }
+
+  Future<void> _applyQuery(String text) async {
+    final r = QueryParser.parse(text);
+    if (r.riskIntent) {
+      await _showBlocked(r.riskReason);
+      return;
+    }
+    var changed = false;
+    if (r.stockId != null && MarketRepository.instance.series(r.stockId!) != null) {
+      _stockId = r.stockId!;
+      changed = true;
+    }
+    if (r.strategyId != null) {
+      _strategyId = r.strategyId!;
+      changed = true;
+    }
+    if (r.years != null) {
+      _years = r.years!;
+      changed = true;
+    }
+    setState(() {});
+    if (changed) {
+      _snack('已為您套用：${_stockName(_stockId)}・$_years 年・${strategyById(_strategyId).name}');
+    } else {
+      _snack('沒有聽清楚股票或策略，請直接點選下面的按鈕，或用文字輸入。');
+    }
+  }
+
+  String _stockName(String id) {
+    final s = MarketRepository.instance.series(id);
+    return s == null ? id : '${s.name}（$id）';
+  }
+
+  void _openDeepView(String view) {
+    switch (view) {
+      case 'screener':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ScreenerPage()),
+        );
+        break;
+      case 'strategies':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const StrategyListPage()),
+        );
+        break;
+      case 'market':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const MarketPage()),
+        );
+        break;
+      case 'paper':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => PaperPage(presetStockId: _stockId)),
+        );
+        break;
+      case 'learn':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LearnPage()),
+        );
+        break;
+      case 'stock':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => StockProfilePage(stockId: _stockId)),
+        );
+        break;
+      case 'trade':
+        final all = StrategyStore.all();
+        final st = StrategyStore.byId(_tradeStrategyId) ??
+            (all.isNotEmpty ? all.first : TradeStrategyPresets.build().first);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => TradeResultPage(
+            stockId: _stockId,
+            strategy: st,
+            years: _years,
+          ),
+        ));
+        break;
+    }
+  }
+
+  Future<void> _showBlocked(String reason) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.gpp_bad_rounded, color: AppColors.danger, size: 28),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text('合規風控守門 Agent 已攔截',
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(reason, style: const TextStyle(fontSize: 16, height: 1.6)),
+              const SizedBox(height: 14),
+              const InlineDisclaimer(),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('知道了'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startVoice() async {
+    if (!SpeechInputService.supported) {
+      _snack('此瀏覽器不支援語音輸入，請改用下方文字輸入。');
+      return;
+    }
+    final text = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _VoiceDialog(),
+    );
+    if (text != null && text.trim().isNotEmpty) {
+      await _applyQuery(text);
+    }
+  }
+
+  void _run() {
+    final series = MarketRepository.instance.series(_stockId);
+    if (series == null) {
+      _snack('請從上方清單選擇標的，或直接輸入代號。');
+      return;
+    }
+    // 個人自用版：可切到「交易策略回測」（含停利停損、手續費、證交稅）
+    if (AppModeController.instance.isPersonal && _runType == 'trade') {
+      final st = StrategyStore.byId(_tradeStrategyId) ??
+          (StrategyStore.all().isNotEmpty
+              ? StrategyStore.all().first
+              : TradeStrategyPresets.build().first);
+      Navigator.of(context).push(MaterialPageRoute<bool>(
+        builder: (_) => TradeResultPage(
+          stockId: _stockId,
+          strategy: st,
+          years: _years,
+        ),
+      ));
+      return;
+    }
+    Navigator.of(context)
+        .push(MaterialPageRoute<bool>(
+          builder: (_) => ResultPage(
+            stockId: _stockId,
+            strategyId: _strategyId,
+            years: _years,
+          ),
+        ))
+        .then((_) {
+      if (mounted) setState(() => _saved = ReportStore.list());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: AppModeController.instance,
+      builder: (context, _) => _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // 比賽版：固定完整免責聲明（不可關閉）
+            // 個人版：一行風險提示（可展開），不佔版面
+            AppModeController.instance.isCompetition
+                ? const DisclaimerBanner()
+                : const PersonalRiskBar(),
+            Expanded(
+              child: !_ready
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 40),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 880),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _header(),
+                              const SizedBox(height: 6),
+                              if (AppModeController.instance.isPersonal)
+                                _toolsCard(),
+                              _pickStockCard(),
+                              _conditionCard(),
+                              _settingsCard(),
+                              _historyCard(),
+                              _glossaryCard(),
+                              _footer(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _header() {
+    final personal = AppModeController.instance.isPersonal;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: cPrimary,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(Icons.savings_rounded,
+                    color: isHighContrast ? Colors.black : Colors.white, size: 28),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text('SilverStock-Quant-Web',
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w900,
+                              color: cInk,
+                              height: 1.15)),
+                    ),
+                    Text(personal ? '台股研究工作站・個人自用' : '台股存股・歷史回測學習工具',
+                        style: TextStyle(fontSize: 15, color: cInkSoft)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // ---- 模式切換 ----
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: isHighContrast ? Colors.black : const Color(0xFFF1EADB),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: cLine),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ChoicePill(
+                    label: '個人自用版',
+                    sub: '選股＋交易策略',
+                    selected: personal,
+                    onTap: () => AppModeController.instance.setMode(AppMode.personal),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ChoicePill(
+                    label: '比賽合規版',
+                    sub: '只做歷史回測',
+                    selected: !personal,
+                    onTap: () {
+                      AppModeController.instance.setMode(AppMode.competition);
+                      setState(() => _runType = 'stock');
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              const _Tag('繁體中文'),
+              const _Tag('大字適老化'),
+              const _Tag('iPad mini 優先'),
+              _Tag(personal ? '選股＋交易回測' : '5 個 Agent 協作'),
+              _Tag(personal ? '本機儲存' : '只做歷史回測'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          NoticeBar(
+            icon: Icons.school_outlined,
+            text: personal
+                ? '個人自用：① 先用「選股篩選」挑標的 → ② 在「我的交易策略」設定進場／加碼／停利停損 → ③ 回測看歷史表現。'
+                    '可隨時切到「比賽合規版」檢視只做歷史回測的版本。'
+                : '怎麼用：① 選一檔股票 → ② 選期間和存股節奏 → ③ 按「執行回測」。'
+                    '系統會依序跑 5 個 Agent，最後由風控 Agent 檢查用詞並附上免責聲明。'
+                    '本工具只做歷史回測學習，不做投資建議。',
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 個人自用版工具入口
+  Widget _toolsCard() {
+    final strategyCount = StrategyStore.count();
+    return SectionCard(
+      title: '個人自用工具',
+      icon: Icons.workspace_premium_rounded,
+      subtitle: '這些功能只在個人自用版提供；比賽合規版會自動隱藏。',
+      child: Column(
+        children: [
+          ActionButton(
+            label: '市場觀察',
+            sub: '大盤溫度・產業溫度・歷史條件機率',
+            icon: Icons.public_rounded,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const MarketPage()),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ActionButton(
+            label: '選股篩選與建議',
+            sub: '${MarketRepository.instance.all.length} 檔標的・殖利率／評價／配息／成長／風險打分',
+            icon: Icons.filter_alt_rounded,
+            primary: false,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ScreenerPage()),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ActionButton(
+                  label: '我的交易策略',
+                  sub: '$strategyCount 組',
+                  icon: Icons.tune_rounded,
+                  primary: false,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const StrategyListPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ActionButton(
+                  label: '模擬交易盤',
+                  sub: '虛擬資金練手',
+                  icon: Icons.shopping_cart_rounded,
+                  primary: false,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaperPage()),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ActionButton(
+                  label: '學習路徑',
+                  sub: '8 堂課・做中學',
+                  icon: Icons.school_rounded,
+                  primary: false,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const LearnPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ActionButton(
+                  label: '新增策略',
+                  icon: Icons.add_rounded,
+                  primary: false,
+                  onPressed: () async {
+                    final r = await Navigator.of(context).push<TradeStrategy>(
+                      MaterialPageRoute(
+                          builder: (_) => const StrategyEditorPage(origin: null)),
+                    );
+                    if (r != null) setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pickStockCard() {
+    final series = MarketRepository.instance.series(_stockId);
+    final total = MarketRepository.instance.all.length;
+    return SectionCard(
+      title: '① 選一檔想看的股票',
+      icon: Icons.search_rounded,
+      trailing: total > 6
+          ? TextButton.icon(
+              onPressed: _pickFromAll,
+              icon: const Icon(Icons.list_rounded, size: 20),
+              label: Text('全部 $total 檔'),
+            )
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final id in kQuickPickIds)
+                if (MarketRepository.instance.series(id) != null)
+                  ChoicePill(
+                    label: MarketRepository.instance.series(id)!.name,
+                    sub: id,
+                    selected: _stockId == id,
+                    onTap: () {
+                      setState(() {
+                        _stockId = id;
+                        _codeCtrl.clear();
+                      });
+                    },
+                  ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _codeCtrl,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            decoration: const InputDecoration(
+              labelText: '或直接輸入股票代號',
+              hintText: '例如 2330、2884、0056',
+              prefixIcon: Icon(Icons.dialpad_rounded),
+            ),
+            onSubmitted: (v) => _resolveStock(v),
+          ),
+          if (_fetchingStock)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2.4),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text('正在向 FinMind 抓取歷史資料（約 10–20 秒，需要 4 次請求）…',
+                        style: TextStyle(fontSize: 13, color: cInkSoft)),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 10),
+          Text(
+            series == null
+                ? '目前選擇：—'
+                : '目前選擇：${series.name}（${series.id}）・${series.industry}'
+                    '・資料 ${series.firstDateText} ～ ${series.lastDateText}',
+            style: TextStyle(fontSize: 14.5, color: cInkSoft, height: 1.5),
+          ),
+          if (series != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => StockProfilePage(stockId: series.id),
+                    ),
+                  ),
+                  icon: const Icon(Icons.candlestick_chart_rounded, size: 20),
+                  label: const Text('看個股檔案（走勢／量能／事件）'),
+                ),
+                if (AppModeController.instance.isPersonal)
+                  TextButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => PaperPage(presetStockId: series.id)),
+                    ),
+                    icon: const Icon(Icons.shopping_cart_outlined, size: 20),
+                    label: const Text('模擬下單'),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// 輸入代號：先查本機（內建 33 檔 + 已建立的線上檔），沒有就問要不要線上建立
+  Future<void> _resolveStock(String raw) async {
+    final id = raw.trim().toUpperCase();
+    if (id.isEmpty) return;
+    final local = MarketRepository.instance.series(id);
+    if (local != null) {
+      setState(() => _stockId = id);
+      _codeCtrl.clear();
+      _snack('已選擇 ${local.name}（${local.id}）'
+          '${MarketRepository.instance.isBuiltIn(id) ? '' : '・線上建立'}');
+      return;
+    }
+    if (!RegExp(r'^[0-9]{4,6}$').hasMatch(id)) {
+      _snack('請輸入 4 位數台股代號，例如 2603、2883');
+      return;
+    }
+    // 比賽版維持固定 33 檔（範圍可控、可重現），線上建立只在個人版開放
+    if (AppModeController.instance.isCompetition) {
+      _snack('比賽合規版僅提供內建 33 檔；切到「個人自用版」可線上建立任意代號。');
+      return;
+    }
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('建立 $id 的檔案？'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text('這個代號不在內建 33 檔內。可以現在向 FinMind 抓取歷史資料，'
+                '建立一份完整檔案（約 10–20 秒，需要網路）。',
+                style: TextStyle(fontSize: 14.5, height: 1.6)),
+            SizedBox(height: 10),
+            Text('· 資料會存在這台裝置，下次開啟不用重抓\n'
+                '· 最多保留 20 檔線上檔案\n'
+                '· 免費 API 有次數限制，請勿連續大量抓取',
+                style: TextStyle(fontSize: 12.5, height: 1.6, color: Color(0xFF6B6250))),
+          ],
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('取消')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('建立檔案')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _fetchingStock = true);
+    try {
+      final s = await RemoteStockService.fetch(id);
+      MarketRepository.instance.register(s);
+      if (!mounted) return;
+      setState(() {
+        _stockId = id;
+        _fetchingStock = false;
+      });
+      _codeCtrl.clear();
+      _snack('已建立 ${s.name}（${s.id}）檔案：${s.firstDateText} ～ ${s.lastDateText}');
+    } on RemoteStockException catch (e) {
+      if (!mounted) return;
+      setState(() => _fetchingStock = false);
+      _snack(e.message);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _fetchingStock = false);
+      _snack('建立失敗：$e');
+    }
+  }
+
+  Future<void> _pickFromAll() async {
+    final stocks = MarketRepository.instance.all;
+    String q = '';
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          final list = stocks
+              .where((s) => q.isEmpty || s.id.contains(q) || s.name.contains(q))
+              .toList();
+          return SafeArea(
+            child: Padding(
+              padding:
+                  EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+              child: SizedBox(
+                height: MediaQuery.of(ctx).size.height * 0.72,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: TextField(
+                        autofocus: false,
+                        onChanged: (v) => setSheet(() => q = v.trim()),
+                        decoration: const InputDecoration(
+                          hintText: '輸入代號或名稱，例如 2330 / 台積電',
+                          prefixIcon: Icon(Icons.search_rounded),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: list.length,
+                        separatorBuilder: (_, __) =>
+                            Divider(height: 1, color: cLine),
+                        itemBuilder: (_, i) {
+                          final s = list[i];
+                          return ListTile(
+                            title: Text('${s.name}（${s.id}）',
+                                style: TextStyle(
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: cInk)),
+                            subtitle: Text(
+                                '${s.industry}'
+                                '${MarketRepository.instance.isBuiltIn(s.id) ? '' : '・線上建立'}',
+                                style:
+                                    TextStyle(fontSize: 12.5, color: cInkSoft)),
+                            trailing: const Icon(Icons.chevron_right_rounded),
+                            onTap: () => Navigator.of(ctx).pop(s.id),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    if (picked != null) setState(() => _stockId = picked);
+  }
+
+  Widget _conditionCard() {
+    final personal = AppModeController.instance.isPersonal;
+    final st = strategyById(_strategyId);
+    final tradeMode = personal && _runType == 'trade';
+    final strategies = StrategyStore.all();
+    final currentTrade = strategies.firstWhere(
+      (e) => e.id == _tradeStrategyId,
+      orElse: () => strategies.isNotEmpty
+          ? strategies.first
+          : TradeStrategyPresets.build().first,
+    );
+
+    return SectionCard(
+      title: '② 回測設定',
+      icon: Icons.tune_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ---- 回測類型（僅個人版）----
+          if (personal) ...[
+            Text('回測類型',
+                style: TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700, color: cInkSoft)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ChoicePill(
+                    label: '存股累積',
+                    sub: '只買不賣・看長期',
+                    selected: _runType == 'stock',
+                    onTap: () => setState(() => _runType = 'stock'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ChoicePill(
+                    label: '交易策略',
+                    sub: '含停利停損・完整買賣',
+                    selected: _runType == 'trade',
+                    onTap: () => setState(() => _runType = 'trade'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+          ],
+          Text('回測期間（年）',
+              style: TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.w700, color: cInkSoft)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final y in <int>[2, 3, 5])
+                ChoicePill(
+                  label: '$y 年',
+                  selected: _years == y,
+                  onTap: () => setState(() => _years = y),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (!tradeMode) ...[
+            Text('存股節奏（3 套預設模板）',
+                style: TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700, color: cInkSoft)),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: _strategyId,
+              isExpanded: true,
+              iconSize: 28,
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w700, color: cInk),
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.timeline_rounded),
+              ),
+              items: [
+                for (final s in kStrategies)
+                  DropdownMenuItem<String>(
+                    value: s.id,
+                    child: Text(s.name, overflow: TextOverflow.ellipsis),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v != null) setState(() => _strategyId = v);
+              },
+            ),
+            const SizedBox(height: 10),
+            NoticeBar(text: '${st.name}：${st.rule}', icon: Icons.menu_book_rounded),
+          ] else ...[
+            Text('交易策略（可自行調整參數）',
+                style: TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700, color: cInkSoft)),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: currentTrade.id,
+              isExpanded: true,
+              iconSize: 28,
+              style: TextStyle(
+                  fontSize: 17, fontWeight: FontWeight.w700, color: cInk),
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.rule_rounded),
+              ),
+              items: [
+                for (final s in strategies)
+                  DropdownMenuItem<String>(
+                    value: s.id,
+                    child: Text(s.name, overflow: TextOverflow.ellipsis),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v != null) setState(() => _tradeStrategyId = v);
+              },
+            ),
+            const SizedBox(height: 10),
+            NoticeBar(
+              icon: Icons.rule_rounded,
+              text: '${currentTrade.conditionLines.join('、')}\n'
+                  '${currentTrade.exitLines.join('；')}\n'
+                  '本金 ${money(currentTrade.totalCapital)}・每次投入 ${money(currentTrade.trancheAmount)}',
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const StrategyListPage()),
+                  );
+                  setState(() {});
+                },
+                icon: const Icon(Icons.tune_rounded),
+                label: const Text('管理／新增策略'),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          Text('也可以直接說一句（語音或文字）',
+              style: TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.w700, color: cInkSoft)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _queryCtrl,
+            style: const TextStyle(fontSize: 17, height: 1.5),
+            decoration: const InputDecoration(
+              hintText: '例如：用高殖利率策略回測台積電過去 5 年',
+              prefixIcon: Icon(Icons.chat_bubble_outline_rounded),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ActionButton(
+                  label: '語音輸入',
+                  icon: Icons.mic_rounded,
+                  primary: false,
+                  onPressed: _startVoice,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ActionButton(
+                  label: '解析這句話',
+                  icon: Icons.auto_fix_high_rounded,
+                  primary: false,
+                  onPressed: () {
+                    final t = _queryCtrl.text;
+                    if (t.trim().isEmpty) {
+                      _snack('請先輸入或說一句話。');
+                    } else {
+                      _applyQuery(t);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          ActionButton(
+            label: tradeMode ? '執行交易回測' : '執行回測',
+            sub: tradeMode
+                ? '含手續費、證交稅、停利停損，結果為歷史模擬'
+                : '只用公開歷史資料模擬，不會下單、不會預測',
+            icon: Icons.play_circle_fill_rounded,
+            onPressed: _run,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _settingsCard() {
+    final st = AppSettings.instance;
+    return SectionCard(
+      title: '③ 適老化設定',
+      icon: Icons.accessibility_new_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (var i = 0; i < AppSettings.labels.length; i++)
+                ChoicePill(
+                  label: AppSettings.labels[i],
+                  selected: st.fontIndex == i,
+                  onTap: () => st.setFontIndex(i),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: st.highContrast,
+            onChanged: st.setHighContrast,
+            title: Text('高對比模式',
+                style: TextStyle(
+                    fontSize: 17, fontWeight: FontWeight.w700, color: cInk)),
+            subtitle: Text('黑底黃字，適合光線不足或視力較弱時使用',
+                style: TextStyle(fontSize: 13.5, color: cInkSoft)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _historyCard() {
+    return SectionCard(
+      title: '我的學習紀錄（存在這台裝置）',
+      icon: Icons.history_rounded,
+      subtitle: '報告只存在瀏覽器本機，不會上傳，也不需要在雲端註冊帳號。',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_saved.isEmpty)
+            Text('還沒有存檔。回測完成後按「存到本機」，就會出現在這裡。',
+                style: TextStyle(fontSize: 15, color: cInkSoft, height: 1.6))
+          else
+            for (final r in _saved.take(5))
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isHighContrast ? Colors.black : const Color(0xFFF6F1E7),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: cLine),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${r.stockName}（${r.stockId}）・${r.strategyName}',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: cInk)),
+                          Text('${r.period}　年化 ${pct(r.irr)}　回撤 ${pct(r.maxDrawdown)}',
+                              style:
+                                  TextStyle(fontSize: 13.5, color: cInkSoft)),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: '刪除這筆',
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      onPressed: () {
+                        ReportStore.remove(r.id);
+                        setState(() => _saved = ReportStore.list());
+                      },
+                    ),
+                  ],
+                ),
+              ),
+          if (_saved.isNotEmpty)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () {
+                  ReportStore.clear();
+                  setState(() => _saved = <SavedReport>[]);
+                },
+                icon: const Icon(Icons.delete_sweep_rounded),
+                label: const Text('清除全部'),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _glossaryCard() {
+    return SectionCard(
+      title: '名詞小辭典（看不懂就點開）',
+      icon: Icons.translate_rounded,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: Column(
+          children: [
+            for (final e in kGlossary.entries)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                childrenPadding: const EdgeInsets.only(bottom: 8),
+                title: Text(e.key,
+                    style: TextStyle(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w700,
+                        color: cInk)),
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(e.value,
+                        style: TextStyle(
+                            fontSize: 15, height: 1.65, color: cInkSoft)),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _footer() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(kDataSourceNote,
+              style: TextStyle(fontSize: 12.5, height: 1.6, color: cInkSoft)),
+          const SizedBox(height: 6),
+          Text('資料快照日期：${MarketRepository.instance.capturedAt}　$kAppVersion',
+              style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+          const SizedBox(height: 6),
+          Text('本作品為 WorkBuddy「1024 造物挑戰」參賽 Demo，不提供任何投資建議。',
+              style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  final String text;
+  const _Tag(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: isHighContrast ? Colors.black : cPrimary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: cPrimary.withOpacity(0.35)),
+      ),
+      child: Text(text,
+          style: TextStyle(
+              fontSize: 12.5, fontWeight: FontWeight.w700, color: cPrimary)),
+    );
+  }
+}
+
+/// 語音輸入對話框
+class _VoiceDialog extends StatefulWidget {
+  const _VoiceDialog({Key? key}) : super(key: key);
+
+  @override
+  State<_VoiceDialog> createState() => _VoiceDialogState();
+}
+
+class _VoiceDialogState extends State<_VoiceDialog> {
+  String _text = '';
+  String _status = '正在聽…請對著麥克風說一句話';
+  bool _finished = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _listen();
+  }
+
+  Future<void> _listen() async {
+    final result = await SpeechInputService.listen(
+      onPartial: (t) {
+        if (mounted) setState(() => _text = t);
+      },
+      onError: (e) {
+        if (!mounted) return;
+        setState(() {
+          _status = e == 'not-allowed'
+              ? '麥克風沒有授權。請允許麥克風，或直接關閉改用文字輸入。'
+              : '語音辨識中斷（$e），可以改用文字輸入。';
+          _finished = true;
+        });
+      },
+    );
+    if (!mounted) return;
+    setState(() {
+      _finished = true;
+      if (result != null && result.isNotEmpty) {
+        _text = result;
+        _status = '辨識完成，請確認文字';
+      } else if (_text.isEmpty) {
+        _status = '沒有聽到聲音，可以再試一次或改用文字輸入。';
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: const [
+          Icon(Icons.mic_rounded, size: 28),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text('語音輸入',
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 460,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_status, style: const TextStyle(fontSize: 15, height: 1.6)),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 72),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF6F1E7),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFD9D0BE)),
+              ),
+              child: Text(_text.isEmpty ? '（還沒聽到內容）' : _text,
+                  style: const TextStyle(fontSize: 18, height: 1.5)),
+            ),
+            const SizedBox(height: 10),
+            Text('例如：「用高殖利率策略回測台積電過去 5 年」',
+                style: TextStyle(fontSize: 13, color: cInkSoft)),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            SpeechInputService.abort();
+            Navigator.of(context).pop();
+          },
+          child: const Text('取消'),
+        ),
+        TextButton(
+          onPressed: _finished
+              ? () => Navigator.of(context).pop(_text)
+              : null,
+          child: const Text('用這句話'),
+        ),
+      ],
+    );
+  }
+}

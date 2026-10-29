@@ -1,0 +1,23 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+
+# Web 构建产物（交由 CI / Vercel 生成）
+build/web/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 临时
+*.log
+.env
+.env.local

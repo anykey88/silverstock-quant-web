@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+
+  <!-- iPad mini 8.3 吋 Safari 優先：不鎖縮放（維持無障礙），但版面本身不需要手動縮放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="SilverStock-Quant-Web：面向台胞銀髮存股族的台股多 Agent 量化研究工具。僅整理公開歷史資料並執行歷史回測，僅供學習復盤，不構成投資建議。">
+  <meta name="theme-color" content="#124E8C">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SilverStock">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>SilverStock-Quant-Web｜台股存股・歷史回測學習工具</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #FBF7EF;
+      font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      /* 避免 iOS 轉向時自動放大字體，造成版面跳動 */
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+    #boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      text-align: center;
+      color: #124E8C;
+    }
+    #boot .t { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
+    #boot .s { font-size: 15px; color: #6B6250; line-height: 1.6; max-width: 520px; }
+    #boot .bar {
+      width: min(280px, 70vw); height: 8px; border-radius: 4px; background: #E7DFCE; overflow: hidden;
+    }
+    #boot .bar > i {
+      display: block; height: 100%; width: 40%; border-radius: 4px; background: #124E8C;
+      animation: slide 1.2s ease-in-out infinite;
+    }
+    @keyframes slide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+    .boot-note {
+      margin-top: 10px; font-size: 12.5px; color: #8A7F68; line-height: 1.7; max-width: 520px;
+    }
+    noscript .ns-box {
+      background: #FFF1CC; border-top: 4px solid #B3261E; padding: 12px 16px;
+      font-size: 14px; line-height: 1.6; color: #3A2A00; font-weight: 700;
+    }
+  </style>
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
+    // 在 Flutter 啟動（並改寫網址）之前，先把原始查詢字串保留下來，供深連結使用。
+    window.__SSQ_BOOT_QUERY__ = window.location.search + window.location.hash;
+  </script>
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+  <noscript>
+    <div class="ns-box">
+      ⚠️免責聲明：本工具僅整理台股公開歷史資料，執行策略歷史回測，僅作為學習復盤使用，不構成任何投資建議，歷史回測結果不等於未來收益，證券投資存在風險，請自行承擔全部投資風險，本工具無任何實盤交易下單功能。
+    </div>
+    <p style="padding:16px;font-size:15px;">請開啟 JavaScript 後重新整理，即可使用本工具。</p>
+  </noscript>
+
+  <div id="boot">
+    <div class="t">SilverStock-Quant-Web</div>
+    <div class="s">台股存股・歷史回測學習工具<br>正在準備大字介面…</div>
+    <div class="bar"><i></i></div>
+    <div class="boot-note">
+      本工具僅整理台股公開歷史資料，執行策略歷史回測，僅作為學習復盤使用，<br>
+      不構成任何投資建議，無任何實盤交易下單功能。
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function (ev) {
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      }).then(function (engineInitializer) {
+        return engineInitializer.initializeEngine();
+      }).then(function (appRunner) {
+        return appRunner.runApp();
+      }).then(function () {
+        var el = document.getElementById('boot');
+        if (el) el.remove();
+      });
+    });
+  </script>
+</body>
+</html>
