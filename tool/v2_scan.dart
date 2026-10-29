@@ -727,8 +727,13 @@ Future<void> main(List<String> args) async {
   Future<void> flush({bool verbose = false}) async {
     final buyTop = picks.toList()
       ..sort((a, b) => b.buyScore.compareTo(a.buyScore));
-    final trimTop = picks.where((p) => p.trimScore >= 15).toList()
-      ..sort((a, b) => b.trimScore.compareTo(a.trimScore));
+    // 兩份名單必須互斥。實測遠東新同時以 70.6 分進買進第 4、又以 15.3 分
+    // 進減碼第 5——「便宜但在跌」在資料上說得通，放在兩個名單裡只會讓人混亂。
+    // 判準：已經被選為買進觀察的，不進減碼觀察。
+    final buyIds = buyTop.take(10).map((p) => p.id).toSet();
+    final trimTop =
+        picks.where((p) => p.trimScore >= 15 && !buyIds.contains(p.id)).toList()
+          ..sort((a, b) => b.trimScore.compareTo(a.trimScore));
     final payload = _buildPayload(
       picks: picks,
       buyTop: buyTop,
