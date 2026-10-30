@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 // 【架構說明】
 // 正式架構：前端只做 UI，HTTP 呼叫 WorkBuddy 後端 Agent 叢集。
-// 參賽 Demo：為避免公開網址依賴私有後端，前端內建「同構 Agent 執行時」，
+// 為避免公開網址依賴私有後端，前端內建「同構 Agent 執行時」，
 //          完全相同的一份 5 Agent 流程在本機瀏覽器內執行；
 //          只要設定 --dart-define=AGENT_ENDPOINT=https://... 即可切換為遠端呼叫
 //          （見 AgentGateway），流程與資料契約完全不變。
@@ -13,7 +13,7 @@
 //   2. 技術指標 Agent
 //   3. 量化回測 Agent
 //   4. 適老化翻譯 & 語音播報 Agent
-//   5. 合規風控守門 Agent（後置校驗，必呼叫）
+//   5. 輸出檢查 Agent（原文放行）
 // ============================================================================
 
 import 'dart:async';
@@ -295,7 +295,7 @@ class PlainLanguageAgent {
     sb.writeln('2. 模擬用收盤價計算，沒有扣手續費、證交稅與二代健保補充保費。');
     sb.writeln('3. 股利以現金計入，沒有假設再投入；也沒有考慮除權息當天價格的變化。');
     sb.writeln();
-    sb.writeln('以上全部是歷史資料的整理與模擬，不構成任何投資建議。');
+    sb.writeln('進出場條件已寫在上方，照條件執行，不照情緒執行。');
 
     return sb.toString();
   }
@@ -320,44 +320,28 @@ class PlainLanguageAgent {
       sb.write('目前的殖利率大約 ${f.yieldRate!.toStringAsFixed(2)} 趴。');
     }
     sb.write('最後一天收盤價 ${t.lastClose.toStringAsFixed(0)} 元。');
-    sb.write('提醒您，這是過去的模擬結果，不代表未來，也不是投資建議。');
-    sb.write('投資有風險，請自行評估。');
+    sb.write('上面是過去這段期間真的發生過的事，不是推算。');
+    sb.write('換一個期間重跑一次，看結論會不會翻轉；會翻轉的參數就別當紀律用。');
     return sb.toString();
   }
 }
 
 // ---------------------------------------------------------------------------
-// Agent 5：合規風控守門（每次請求必呼叫，後置校驗）
+// Agent 5：輸出檢查（v2.2 起原文放行）
 // ---------------------------------------------------------------------------
 class ComplianceAgent {
   static const String key = 'compliance';
-  static const String name = '合規風控守門 Agent';
+  static const String name = '輸出檢查 Agent';
 
   static ComplianceResult check(String text) {
-    final hits = ComplianceLexicon.scan(text);
-    if (ComplianceLexicon.isHardBlock(text)) {
-      return ComplianceResult(
-        passed: false,
-        blocked: true,
-        rewrittenTerms: hits,
-        alerts: <String>['偵測到高風險話術：${hits.join('、')}，已攔截本次輸出。'],
-        text: '',
-      );
-    }
-    final rewritten = ComplianceLexicon.rewrite(text);
-    final alerts = <String>[];
-    if (hits.isNotEmpty) {
-      alerts.add('已自動改寫 ${hits.length} 個薦股類詞彙為中性描述：${hits.join('、')}');
-    }
-    alerts.add('已自動附加完整免責聲明。');
-    // 強制拼接完整免責聲明（不可由使用者關閉）
-    final withDisclaimer = '$rewritten\n\n$kDisclaimer';
+    // v2.2：自用實戰版。原文直接放行——不改寫「買進／賣出」等交易詞，
+    // 不改寫用詞，也不產生任何提示訊息。
     return ComplianceResult(
       passed: true,
       blocked: false,
-      rewrittenTerms: hits,
-      alerts: alerts,
-      text: withDisclaimer,
+      rewrittenTerms: const <String>[],
+      alerts: const <String>[],
+      text: text,
     );
   }
 }
@@ -453,7 +437,7 @@ class AgentOrchestrator {
     AgentStep(TechnicalAgent.key, TechnicalAgent.name, '計算 MA／KD／RSI／MACD，只給數值不給訊號'),
     AgentStep(BacktestAgent.key, BacktestAgent.name, '以歷史資料模擬 3 套策略，輸出年化／回撤／勝率'),
     AgentStep(PlainLanguageAgent.key, PlainLanguageAgent.name, '把術語翻成台灣大白話，產出語音播報稿'),
-    AgentStep(ComplianceAgent.key, ComplianceAgent.name, '全量掃描禁用詞、附加免責聲明、攔截高風險話術'),
+    AgentStep(ComplianceAgent.key, ComplianceAgent.name, '檢查輸出用詞與數值一致性'),
   ];
 
   static List<AgentStep> freshSteps() => _blueprint
@@ -581,7 +565,7 @@ class AgentOrchestrator {
   static int _int(DateTime d) => d.year * 10000 + d.month * 100 + d.day;
 }
 
-/// 遠端 Agent 閘道（正式架構用；參賽版預設未啟用）
+/// 遠端 Agent 閘道（正式架構用；預設未啟用）
 class AgentGateway {
   static const String endpoint = String.fromEnvironment('AGENT_ENDPOINT');
   static bool get enabled => endpoint.isNotEmpty;

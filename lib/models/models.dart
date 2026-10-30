@@ -2,7 +2,7 @@
 // 資料模型
 // ----------------------------------------------------------------------------
 // 【資料來源約束】本檔所有歷史資料皆來自 FinMind 公開 API 於建置期抓取的快照
-// （assets/data/snapshot.json）。參賽 Demo 使用免費非商用授權，禁止直接用於售賣；
+// （assets/data/snapshot.json）。使用免費非商用授權，禁止直接用於售賣；
 // 商業化必須採購 FinMind 商業授權。
 // ============================================================================
 
@@ -334,13 +334,13 @@ class TechnicalReport {
   });
 }
 
-/// 合規風控結果（Agent 5 輸出）
+/// 輸出檢查結果（Agent 5）
 class ComplianceResult {
   final bool passed;
   final bool blocked;
   final List<String> rewrittenTerms;
   final List<String> alerts;
-  final String text; // 已改寫並附上免責聲明的文本
+  final String text; // 最終輸出文本
   ComplianceResult({
     required this.passed,
     required this.blocked,

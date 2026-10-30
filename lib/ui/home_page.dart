@@ -211,21 +211,11 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 'daily':
-        // 比賽版承諾「只做歷史回測」，每日名單屬於自用功能，這裡擋住
-        if (AppModeController.instance.isCompetition) {
-          _snack('每日精選屬個人自用功能，請先切到「個人自用版」。');
-          break;
-        }
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DailyPicksPage()),
         );
         break;
       case 'accounts':
-        // 多帳戶記帳屬個人自用功能（涉及家人持股），比賽版不開
-        if (AppModeController.instance.isCompetition) {
-          _snack('投資帳戶屬個人自用功能，請先切到「個人自用版」。');
-          break;
-        }
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const AccountsPage()),
         );
@@ -259,7 +249,7 @@ class _HomePageState extends State<HomePage> {
             Icon(Icons.gpp_bad_rounded, color: AppColors.danger, size: 28),
             SizedBox(width: 8),
             Expanded(
-              child: Text('合規風控守門 Agent 已攔截',
+              child: Text('這個組合沒有通過檢查',
                   style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
             ),
           ],
@@ -348,11 +338,6 @@ class _HomePageState extends State<HomePage> {
         bottom: false,
         child: Column(
           children: [
-            // 比賽版：固定完整免責聲明（不可關閉）
-            // 個人版：一行風險提示（可展開），不佔版面
-            AppModeController.instance.isCompetition
-                ? const DisclaimerBanner()
-                : const PersonalRiskBar(),
             Expanded(
               child: !_ready
                   ? const Center(child: CircularProgressIndicator())
@@ -420,46 +405,30 @@ class _HomePageState extends State<HomePage> {
                               color: cInk,
                               height: 1.15)),
                     ),
-                    Text(personal ? '台股研究工作站・個人自用' : '台股存股・歷史回測學習工具',
+                    Text('台股實戰工作站',
                         style: TextStyle(fontSize: 15, color: cInkSoft)),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
+              // 版本號固定於右上角
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isHighContrast
+                      ? Colors.black
+                      : cPrimary.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: cPrimary.withOpacity(0.28)),
+                ),
+                child: Text(kAppVersion,
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                        color: isHighContrast ? AppColors.hcPrimary : cPrimary)),
+              ),
             ],
-          ),
-          const SizedBox(height: 10),
-          // ---- 模式切換 ----
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: isHighContrast ? Colors.black : const Color(0xFFF1EADB),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: cLine),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ChoicePill(
-                    label: '個人自用版',
-                    sub: '選股＋交易策略',
-                    selected: personal,
-                    onTap: () => AppModeController.instance.setMode(AppMode.personal),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ChoicePill(
-                    label: '比賽合規版',
-                    sub: '只做歷史回測',
-                    selected: !personal,
-                    onTap: () {
-                      AppModeController.instance.setMode(AppMode.competition);
-                      setState(() => _runType = 'stock');
-                    },
-                  ),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -469,19 +438,15 @@ class _HomePageState extends State<HomePage> {
               const _Tag('繁體中文'),
               const _Tag('大字適老化'),
               const _Tag('iPad mini 優先'),
-              _Tag(personal ? '選股＋交易回測' : '5 個 Agent 協作'),
-              _Tag(personal ? '本機儲存' : '只做歷史回測'),
+              const _Tag('選股＋交易回測'),
+              const _Tag('本機儲存'),
             ],
           ),
           const SizedBox(height: 12),
-          NoticeBar(
-            icon: Icons.school_outlined,
-            text: personal
-                ? '個人自用：① 先用「選股篩選」挑標的 → ② 在「我的交易策略」設定進場／加碼／停利停損 → ③ 回測看歷史表現。'
-                    '可隨時切到「比賽合規版」檢視只做歷史回測的版本。'
-                : '怎麼用：① 選一檔股票 → ② 選期間和存股節奏 → ③ 按「執行回測」。'
-                    '系統會依序跑 5 個 Agent，最後由風控 Agent 檢查用詞並附上免責聲明。'
-                    '本工具只做歷史回測學習，不做投資建議。',
+          const NoticeBar(
+            icon: Icons.trending_up_rounded,
+            text: '每天：① 看「每日精選」的買進／減碼名單 → ② 用「市場觀察」確認大盤溫度 → '
+                '③ 進「投資帳戶」看組合風險。個股買賣點用「回測設定」跑策略驗證進出場條件。',
           ),
         ],
       ),
@@ -492,9 +457,9 @@ class _HomePageState extends State<HomePage> {
   Widget _toolsCard() {
     final strategyCount = StrategyStore.count();
     return SectionCard(
-      title: '個人自用工具',
+      title: '交易工具',
       icon: Icons.workspace_premium_rounded,
-      subtitle: '這些功能只在個人自用版提供；比賽合規版會自動隱藏。',
+      subtitle: '選股、價位、時機、部位——四個環節各自有工具。',
       child: Column(
         children: [
           ActionButton(
@@ -898,11 +863,6 @@ class _HomePageState extends State<HomePage> {
 
   /// 詢問並建立線上檔案（原本 _resolveStock 的後半段，抽出來共用）
   Future<void> _confirmAndBuild(String id, String? knownName) async {
-    if (AppModeController.instance.isCompetition) {
-      _snack('比賽合規版僅提供內建 33 檔；切到「個人自用版」可線上建立任意代號。');
-      return;
-    }
-
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1404,10 +1364,7 @@ class _HomePageState extends State<HomePage> {
           Text(kDataSourceNote,
               style: TextStyle(fontSize: 12.5, height: 1.6, color: cInkSoft)),
           const SizedBox(height: 6),
-          Text('資料快照日期：${MarketRepository.instance.capturedAt}　$kAppVersion',
-              style: TextStyle(fontSize: 12.5, color: cInkSoft)),
-          const SizedBox(height: 6),
-          Text('本作品為 WorkBuddy「1024 造物挑戰」參賽 Demo，不提供任何投資建議。',
+          Text('資料快照日期：${MarketRepository.instance.capturedAt}',
               style: TextStyle(fontSize: 12.5, color: cInkSoft)),
         ],
       ),

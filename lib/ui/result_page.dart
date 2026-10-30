@@ -168,7 +168,7 @@ class _ResultPageState extends State<ResultPage> {
     return SectionCard(
       title: 'WorkBuddy Agent 協作中',
       icon: Icons.hub_rounded,
-      subtitle: '依序：基本面 → 技術指標 → 量化回測 → 適老化翻譯 → 合規風控（後置校驗，必呼叫）',
+      subtitle: '依序：基本面 → 技術指標 → 量化回測 → 白話翻譯',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -182,7 +182,7 @@ class _ResultPageState extends State<ResultPage> {
 
   Widget _blockedCard() {
     return SectionCard(
-      title: '合規風控守門 Agent 已攔截本次輸出',
+      title: '這個組合沒有通過檢查',
       icon: Icons.gpp_bad_rounded,
       accent: AppColors.danger,
       child: Column(
@@ -412,8 +412,7 @@ class _ResultPageState extends State<ResultPage> {
         child: NoticeBar(
           icon: Icons.check_circle_outline_rounded,
           color: AppColors.safe,
-          text: '這次的資料規則檢查，沒有發現虧損、配息明顯減少或大幅回落等情況。'
-              '（這只是資料檢查結果，不代表沒有風險，也不是投資建議。）',
+          text: '這次的資料規則檢查，沒有發現虧損、配息明顯減少或大幅回落等情況。',
         ),
       );
     }
@@ -674,7 +673,7 @@ class _ResultPageState extends State<ResultPage> {
     return SectionCard(
       title: '大白話報告（適老化翻譯 Agent 產出）',
       icon: Icons.record_voice_over_rounded,
-      subtitle: '把上面那些數字，翻成平常講話的方式。已由合規風控 Agent 檢查用詞。',
+      subtitle: '把上面那些數字，翻成平常講話的方式。',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

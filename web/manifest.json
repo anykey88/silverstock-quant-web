@@ -1,11 +1,11 @@
 {
-    "name": "SilverStock-Quant-Web 台股存股歷史回測學習工具",
+    "name": "SilverStock 台股實戰工作站",
     "short_name": "SilverStock",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FBF7EF",
     "theme_color": "#124E8C",
-    "description": "面向台胞銀髮存股族的台股多 Agent 量化研究工具：僅整理公開歷史資料並執行歷史回測，僅供學習復盤，不構成投資建議，無實盤下單功能。",
+    "description": "選股篩選、每日買進與減碼名單、估值合理區、組合風險體檢。",
     "orientation": "any",
     "prefer_related_applications": false,
     "icons": [

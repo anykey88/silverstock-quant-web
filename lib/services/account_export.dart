@@ -33,7 +33,7 @@ class AccountExport {
     b.writeln('未實現損益,${_n(a.unrealized(priceOf))}');
     b.writeln('總報酬率,${a.returnPct(priceOf).toStringAsFixed(2)}%');
     b.writeln('匯出時間,${_now()}');
-    b.writeln('說明,本檔為個人記帳紀錄，非對帳單、非投資建議；數字以本機紀錄與最新收盤價估算');
+    b.writeln('說明,個人記帳紀錄；數字以本機紀錄與最新收盤價估算');
     b.writeln();
 
     b.writeln('[持倉]');
@@ -75,7 +75,7 @@ class AccountExport {
     final eq = book.totalEquity(priceOf);
     b.writeln('合計報酬率,${cap > 0 ? ((eq - cap) / cap * 100).toStringAsFixed(2) : '0.00'}%');
     b.writeln('匯出時間,${_now()}');
-    b.writeln('說明,本檔為個人記帳紀錄，非對帳單、非投資建議');
+    b.writeln('說明,個人記帳紀錄');
     b.writeln();
 
     b.writeln('[帳戶總覽]');

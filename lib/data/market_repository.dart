@@ -3,12 +3,12 @@
 // ----------------------------------------------------------------------------
 // 【Agent 呼叫邏輯說明】
 // 前端不直接計算業務邏輯，所有資料先經 MarketRepository 取得，再交給 agents/ 目錄下
-// 的 5 個 Agent 依序處理（基本面 → 技術指標 → 回測 → 適老化翻譯 → 合規風控）。
+// 的 5 個 Agent 依序處理（基本面 → 技術指標 → 回測 → 白話翻譯 → 輸出檢查）。
 //
 // 【資料來源約束】
 // - 預設：assets/data/snapshot.json（建置期自 FinMind 公開 API 抓取的真實歷史資料快照）
 // - 選用：FinMind v4 公開 API 即時查詢（需自行申請 token，免費額度有限）
-// - 兩者皆僅限本次參賽 Demo 使用；商業化必須採購 FinMind 商業授權，
+// - 商業化必須採購 FinMind 商業授權，
 //   禁止把免費 API 直接用於售賣。
 // ============================================================================
 
@@ -100,7 +100,7 @@ class MarketRepository {
 }
 
 /// FinMind 公開 API 客戶端（選用）。
-/// 說明：參賽版預設關閉即時連線，改用建置期快照，避免免費額度與跨域限制影響演示；
+/// 說明：預設關閉即時連線，改用建置期快照，避免免費額度與跨域限制；
 /// 於「進階設定」開啟後，改為即時查詢，資料欄位與快照完全一致。
 class FinMindClient {
   static const String baseUrl = 'https://api.finmindtrade.com/api/v4/data';
@@ -111,7 +111,7 @@ class FinMindClient {
   Future<StockSeries?> fetchDaily(String stockId, DateTime start, DateTime end) async {
     // 注意：Flutter Web 端需 FinMind 允許 CORS；若被瀏覽器攔截，會自動回退到內建快照。
     throw UnimplementedError(
-      '參賽版未啟用即時連線；如需啟用請參考 README「資料來源」章節，'
+      '未啟用即時連線；如需啟用請參考 README「資料來源」章節，'
       '並自行部署代理或採購 FinMind 商業授權。',
     );
   }

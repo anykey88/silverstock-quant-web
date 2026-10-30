@@ -1,4 +1,4 @@
-// 共用 UI 元件（適老化：大字、大按鈕、高對比、固定免責聲明）
+// 共用 UI 元件（大字、大按鈕、高對比）
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -17,72 +17,13 @@ Color get cSurface => isHighContrast ? AppColors.hcSurface : AppColors.surface;
 Color get cLine => isHighContrast ? AppColors.hcLine : AppColors.line;
 Color get cPrimary => isHighContrast ? AppColors.hcPrimary : AppColors.primary;
 
-/// 全局固定免責聲明橫幅：每一頁最上方固定顯示，不可關閉、不可收起。
+/// v2.2：警語橫幅已移除，保留空殼。
+/// v2.2：警語橫幅已移除。保留空殼是為了不讓 11 個頁面的引用整批失效。
 class DisclaimerBanner extends StatelessWidget {
   const DisclaimerBanner({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final hc = isHighContrast;
-    final bg = hc ? const Color(0xFF241E00) : AppColors.warnBg;
-    final fg = hc ? AppColors.hcInk : const Color(0xFF3A2A00);
-    final media = MediaQuery.of(context);
-    final maxH = math.min(media.size.height * 0.34, 320.0);
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bg,
-        border: Border(
-          top: BorderSide(color: hc ? AppColors.hcPrimary : AppColors.warnLine, width: 4),
-          bottom: BorderSide(
-              color: hc ? AppColors.hcPrimary : const Color(0xFFE0B84A), width: 1.5),
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: maxH),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text: '⚠️',
-                    // 指定 emoji 字體堆疊，避免部分系統把 ⚠️ 畫成空心方框
-                    style: TextStyle(
-                      fontSize: 19,
-                      color: fg,
-                      fontFamily: 'Noto Color Emoji',
-                      fontFamilyFallback: const <String>[
-                        'Apple Color Emoji',
-                        'Segoe UI Emoji',
-                        'Noto Emoji',
-                      ],
-                    ),
-                  ),
-                  TextSpan(
-                    text: kDisclaimer.replaceFirst('⚠️', ''),
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      height: 1.5,
-                      fontWeight: FontWeight.w700,
-                      color: fg,
-                    ),
-                  ),
-                ]),
-              ),
-              const SizedBox(height: 2),
-              Text('本區固定顯示，無法關閉',
-                  style: TextStyle(
-                      fontSize: 11, color: fg.withOpacity(0.65), letterSpacing: 0.4)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 /// 區塊卡片
@@ -545,24 +486,6 @@ class _ChartPainter extends CustomPainter {
 
     _drawLine(canvas, primary, xOf, yOf, seriesColors[0], width: 3.0, fill: false);
 
-    // 水印（斜置大字）
-    canvas.save();
-    canvas.translate(padL + w / 2, padT + h / 2);
-    canvas.rotate(-0.22);
-    final wm = TextPainter(
-      text: TextSpan(
-        text: kChartWatermark,
-        style: TextStyle(
-          fontSize: 21,
-          fontWeight: FontWeight.w900,
-          color: ink.withOpacity(0.13),
-          letterSpacing: 2,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    wm.paint(canvas, Offset(-wm.width / 2, -wm.height / 2));
-    canvas.restore();
 
     // 水印（右下角固定標籤，確保任何螢幕尺寸都讀得到）
     final tag = TextPainter(
@@ -720,96 +643,25 @@ class NoticeBar extends StatelessWidget {
   }
 }
 
-/// 免責聲明文字區塊（報告內再次完整展示）
+/// v2.2：報告內嵌區塊已移除。
 class InlineDisclaimer extends StatelessWidget {
   const InlineDisclaimer({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isHighContrast ? Colors.black : AppColors.dangerBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.danger.withOpacity(0.5), width: 1.4),
-      ),
-      child: Text(kDisclaimer,
-          style: TextStyle(
-              fontSize: 13.5, height: 1.6, color: cInk, fontWeight: FontWeight.w600)),
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 String pctOrDash(double? v, {int digits = 2}) => v == null ? '—' : pct(v, digits: digits);
 String numOrDash(double? v, {int digits = 2}) =>
     v == null ? '—' : v.toStringAsFixed(digits);
 
-/// 個人自用版的風險提示條：預設只佔一行，可展開看完整免責聲明。
-/// （比賽版請改用 DisclaimerBanner，該版必須固定完整展示且不可關閉。）
-class PersonalRiskBar extends StatefulWidget {
+/// v2.2：風險提示條已移除，保留空殼。
+/// v2.2：風險提示條已移除。保留空殼，避免各頁面引用報錯。
+class PersonalRiskBar extends StatelessWidget {
   const PersonalRiskBar({Key? key}) : super(key: key);
 
   @override
-  State<PersonalRiskBar> createState() => _PersonalRiskBarState();
-}
-
-class _PersonalRiskBarState extends State<PersonalRiskBar> {
-  bool _open = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: isHighContrast ? const Color(0xFF241E00) : const Color(0xFFFFF6DC),
-      padding: const EdgeInsets.fromLTRB(12, 6, 8, 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded,
-                  size: 18,
-                  color: isHighContrast ? AppColors.hcPrimary : AppColors.gold),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  '個人自用版：歷史資料模擬，非投資建議',
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: cInk),
-                ),
-              ),
-              InkWell(
-                onTap: () => setState(() => _open = !_open),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  child: Text(_open ? '收起' : '詳情',
-                      style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: isHighContrast
-                              ? AppColors.hcPrimary
-                              : AppColors.primary)),
-                ),
-              ),
-            ],
-          ),
-          if (_open)
-            Padding(
-              padding: const EdgeInsets.only(top: 6, right: 8),
-              child: Text(kDisclaimer,
-                  style: TextStyle(
-                      fontSize: 12,
-                      height: 1.55,
-                      color: cInkSoft,
-                      fontWeight: FontWeight.w500)),
-            ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 /// 分數徽章（0-100）

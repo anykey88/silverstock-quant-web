@@ -153,8 +153,8 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              '這是「量化條件篩選」，不是投資建議。\n'
-              '名單告訴你「哪些股票符合我設定的條件」，不告訴你「該買哪一支」。',
+              '分數＝財務品質 30%＋估值位階 30%＋殖利率 20%＋營收動能 20%。\n'
+              '排序在前代表「目前條件最整齊」，不代表明天會漲；條件變了就該重看。',
               style: TextStyle(
                 fontSize: 13.5,
                 height: 1.6,
