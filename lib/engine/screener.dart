@@ -15,7 +15,8 @@ import 'dart:math' as math;
 import '../models/models.dart';
 
 class ScreenerFilter {
-  final Set<String> industries; // 空集合 = 全部產業
+  final Set<String> industries; // 空集合 = 全部產業（包含式）
+  final Set<String> excludeIndustries; // 空集合 = 不排除（排除式）
   final double minYield; // 殖利率下限 %
   final double? maxPer; // 本益比上限
   final int minDivYears; // 連續配息年數下限
@@ -29,6 +30,7 @@ class ScreenerFilter {
 
   const ScreenerFilter({
     this.industries = const <String>{},
+    this.excludeIndustries = const <String>{},
     this.minYield = 0,
     this.maxPer,
     this.minDivYears = 0,
@@ -43,6 +45,7 @@ class ScreenerFilter {
 
   ScreenerFilter copyWith({
     Set<String>? industries,
+    Set<String>? excludeIndustries,
     double? minYield,
     double? maxPer,
     bool clearMaxPer = false,
@@ -60,6 +63,7 @@ class ScreenerFilter {
   }) {
     return ScreenerFilter(
       industries: industries ?? this.industries,
+      excludeIndustries: excludeIndustries ?? this.excludeIndustries,
       minYield: minYield ?? this.minYield,
       maxPer: clearMaxPer ? null : (maxPer ?? this.maxPer),
       minDivYears: minDivYears ?? this.minDivYears,
@@ -72,6 +76,21 @@ class ScreenerFilter {
       lookbackYears: lookbackYears ?? this.lookbackYears,
     );
   }
+
+  /// 防禦逆向收息策略預設：排除高波動科技，要求低價、固定配息、殖利率與評價合理。
+  /// 逆向邏輯：不追熱門電子，改在內需、收息、低波動的標的裡找被冷落但體質穩健的個股。
+  static const ScreenerFilter defensive = ScreenerFilter(
+    excludeIndustries: {
+      '半導體',
+      '電子零組件',
+    },
+    minYield: 4.0,
+    minDivYears: 5,
+    maxPer: 25,
+    maxPrice: 100,
+    lookbackYears: 3,
+    sortBy: 'yield',
+  );
 }
 
 class ScreenedStock {
@@ -125,6 +144,7 @@ class Screener {
       if (f.industries.isNotEmpty && !f.industries.contains(e.series.industry)) {
         return false;
       }
+      if (f.excludeIndustries.contains(e.series.industry)) return false;
       if (e.yieldRate < f.minYield) return false;
       if (f.maxPer != null && e.per != null && e.per! > f.maxPer!) return false;
       if (e.divStreak < f.minDivYears) return false;

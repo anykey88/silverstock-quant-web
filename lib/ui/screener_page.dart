@@ -143,6 +143,24 @@ class _ScreenerPageState extends State<ScreenerPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _label('策略預設（一鍵套用，逆向收息不怕科技巨震）'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ChoicePill(
+                label: '綜合評分',
+                selected: !_f.excludeIndustries.contains('半導體') &&
+                    _f.industries.isEmpty,
+                onTap: () => _apply(const ScreenerFilter()),
+              ),
+              ChoicePill(
+                label: '防禦逆向收息',
+                selected: _f.excludeIndustries.contains('半導體'),
+                onTap: () => _apply(ScreenerFilter.defensive),
+              ),
+            ],
+          ),
           _label('產業（可多選，不選＝全部）'),
           Wrap(
             spacing: 8,
@@ -156,6 +174,24 @@ class _ScreenerPageState extends State<ScreenerPage> {
                     final set = Set<String>.from(_f.industries);
                     if (!set.add(ind)) set.remove(ind);
                     _apply(_f.copyWith(industries: set));
+                  },
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _label('排除產業（逆向策略：把高波動科技濾掉，點選＝不顯示）'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final ind in kIndustries)
+                ChoicePill(
+                  label: ind,
+                  selected: _f.excludeIndustries.contains(ind),
+                  onTap: () {
+                    final set = Set<String>.from(_f.excludeIndustries);
+                    if (!set.add(ind)) set.remove(ind);
+                    _apply(_f.copyWith(excludeIndustries: set));
                   },
                 ),
             ],
