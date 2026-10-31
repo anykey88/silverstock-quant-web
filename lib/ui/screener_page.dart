@@ -34,7 +34,8 @@ class _ScreenerPageState extends State<ScreenerPage> {
 
   Future<void> _load() async {
     await MarketRepository.instance.ensureLoaded();
-    final scored = Screener.scoreAll(MarketRepository.instance.all);
+    final scored = Screener.scoreAll(MarketRepository.instance.all,
+        lookbackYears: _f.lookbackYears);
     if (!mounted) return;
     setState(() {
       _all = scored;
@@ -44,6 +45,16 @@ class _ScreenerPageState extends State<ScreenerPage> {
   }
 
   void _apply(ScreenerFilter f) {
+    // 窗口一改，回撤與風險分都要重算，不能只重篩
+    if (f.lookbackYears != _f.lookbackYears) {
+      setState(() {
+        _f = f;
+        _all = Screener.scoreAll(MarketRepository.instance.all,
+            lookbackYears: f.lookbackYears);
+        _view = Screener.filter(_all, f);
+      });
+      return;
+    }
     setState(() {
       _f = f;
       _view = Screener.filter(_all, f);
@@ -150,6 +161,60 @@ class _ScreenerPageState extends State<ScreenerPage> {
             ],
           ),
           const SizedBox(height: 6),
+          _label('股價範圍（資金有限時，先把買不起的濾掉）'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final cap in const <double>[0, 50, 100, 200, 300, 500, 1000])
+                ChoicePill(
+                  label: cap <= 0 ? '不限' : r'$' + cap.toStringAsFixed(0),
+                  selected: (_f.maxPrice ?? 0) == cap,
+                  onTap: () => _apply(cap <= 0
+                      ? _f.copyWith(clearMaxPrice: true)
+                      : _f.copyWith(maxPrice: cap)),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text('股價下限：',
+                  style: TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w700, color: cInkSoft)),
+              const SizedBox(width: 4),
+              for (final lo in const <double>[0, 10, 20, 50])
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoicePill(
+                    label: lo <= 0 ? '不限' : r'$' + lo.toStringAsFixed(0),
+                    selected: _f.minPrice == lo,
+                    onTap: () => _apply(_f.copyWith(minPrice: lo)),
+                  ),
+                ),
+            ],
+          ),
+          _label('統計窗口（回撤與風險分用哪一段歷史來算）'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final yr in const <int>[1, 2, 3, 0])
+                ChoicePill(
+                  label: yr <= 0 ? '全部歷史' : '近 $yr 年',
+                  selected: _f.lookbackYears == yr,
+                  onTap: () => _apply(_f.copyWith(lookbackYears: yr)),
+                ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 2),
+            child: Text(
+              '窗口越短，越貼近現在的市場脾氣，但容易被單一事件帶偏；'
+              '窗口越長，看得到完整的多空循環，但十年前的黑天鵝對今天的參考價值遞減。',
+              style: TextStyle(fontSize: 12.5, height: 1.5, color: cInkSoft),
+            ),
+          ),
           _slider(
             label: '殖利率至少',
             value: _f.minYield,
@@ -191,7 +256,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
                 : _f.copyWith(maxDistMa60: v)),
           ),
           _slider(
-            label: '近一年最大回撤上限',
+            label: _f.lookbackYears <= 0
+                ? '最大回撤上限（全部歷史）'
+                : '近 ${_f.lookbackYears} 年最大回撤上限',
             value: _f.maxDrawdown1y ?? 80,
             min: 15,
             max: 80,
@@ -363,7 +430,10 @@ class _ScreenerPageState extends State<ScreenerPage> {
                         _kv('本益比', s.per == null ? '—' : s.per!.toStringAsFixed(1)),
                         _kv('配息', '${s.divStreak} 年'),
                         _kv('距季線', signedPct(s.distMa60)),
-                        _kv('年回撤', pct(s.mdd1y)),
+                        _kv(_f.lookbackYears <= 0
+                                ? '最大回撤'
+                                : '${_f.lookbackYears} 年回撤',
+                            pct(s.mddWindow)),
                       ],
                     ),
                   ],

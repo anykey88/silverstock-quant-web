@@ -1,0 +1,64 @@
+name: Live Quotes
+
+# 盤中抓即時報價，寫回 assets/data/live.json。
+#
+# 為什麼不是「真即時」：
+#   GitHub Actions 的 cron 有排隊延遲，實測高峰期會晚 5～15 分鐘才啟動。
+#   加上 checkout + python 啟動，一次大約 30～50 秒。
+#   所以這是「幾分鐘前的價」，不是看盤軟體那種逐筆跳動。
+#
+# 為什麼只有 8 個時段：
+#   Actions 免費額度每月 2000 分鐘。這裡每次約 1 分鐘，
+#   一天 54 次 × 22 個交易日 ≈ 1188 分鐘，會吃掉一半以上。
+#   改成 8 個時段（開盤、10 點、11 點、午盤前後、收盤前、收盤），
+#   一個月約 180 分鐘，留餘裕給每日掃描。
+#   想更密就自己加 cron，但要自己算額度。
+
+on:
+  schedule:
+    # UTC → 台北 +8。以下為台北時間：
+    - cron: '1 1 * * 1-5'    # 09:01 開盤
+    - cron: '0 2 * * 1-5'    # 10:00
+    - cron: '0 3 * * 1-5'    # 11:00
+    - cron: '30 3 * * 1-5'   # 11:30
+    - cron: '0 4 * * 1-5'    # 12:00
+    - cron: '30 4 * * 1-5'   # 12:30
+    - cron: '0 5 * * 1-5'    # 13:00
+    - cron: '35 5 * * 1-5'   # 13:35 收盤前
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-quotes
+  cancel-in-progress: true
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch live quotes
+        run: python3 tool/v2/fetch_live.py
+
+      - name: Commit
+        run: |
+          git config user.name "silverstock-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add assets/data/live.json
+          if git diff --staged --quiet; then
+            echo "無變化"
+          else
+            git commit -m "chore(live): 即時報價 $(date -u '+%H:%M') UTC"
+            git push
+          fi

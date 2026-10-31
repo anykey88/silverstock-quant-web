@@ -23,6 +23,9 @@ class ScreenerFilter {
   final double? maxDrawdown1y; // 近一年最大回撤上限 %
   final double minScore; // 綜合評分下限
   final String sortBy; // score / yield / per / drawdown / eps
+  final double minPrice; // 股價下限（0＝不限），排除雞蛋水餃股
+  final double? maxPrice; // 股價上限（null＝不限），資金有限時最重要的一道
+  final int lookbackYears; // 統計窗口年數（0＝全部歷史）；影響回撤與風險分
 
   const ScreenerFilter({
     this.industries = const <String>{},
@@ -33,6 +36,9 @@ class ScreenerFilter {
     this.maxDrawdown1y,
     this.minScore = 0,
     this.sortBy = 'score',
+    this.minPrice = 0,
+    this.maxPrice,
+    this.lookbackYears = 1,
   });
 
   ScreenerFilter copyWith({
@@ -47,6 +53,10 @@ class ScreenerFilter {
     bool clearMdd = false,
     double? minScore,
     String? sortBy,
+    double? minPrice,
+    double? maxPrice,
+    bool clearMaxPrice = false,
+    int? lookbackYears,
   }) {
     return ScreenerFilter(
       industries: industries ?? this.industries,
@@ -57,6 +67,9 @@ class ScreenerFilter {
       maxDrawdown1y: clearMdd ? null : (maxDrawdown1y ?? this.maxDrawdown1y),
       minScore: minScore ?? this.minScore,
       sortBy: sortBy ?? this.sortBy,
+      minPrice: minPrice ?? this.minPrice,
+      maxPrice: clearMaxPrice ? null : (maxPrice ?? this.maxPrice),
+      lookbackYears: lookbackYears ?? this.lookbackYears,
     );
   }
 }
@@ -70,7 +83,7 @@ class ScreenedStock {
   final double? perRatio;
   final int divStreak;
   final double? epsCagr3y;
-  final double mdd1y;
+  final double mddWindow; // 所選統計窗口內的最大回撤
   final double distMa60;
   final double score;
   final Map<String, double> parts; // 殖利率 / 評價 / 配息 / 成長 / 風險
@@ -86,7 +99,7 @@ class ScreenedStock {
     required this.perRatio,
     required this.divStreak,
     required this.epsCagr3y,
-    required this.mdd1y,
+    required this.mddWindow,
     required this.distMa60,
     required this.score,
     required this.parts,
@@ -97,11 +110,12 @@ class ScreenedStock {
 
 class Screener {
   /// 對全部標的打分（不套用篩選條件）
-  static List<ScreenedStock> scoreAll(List<StockSeries> all) {
+  static List<ScreenedStock> scoreAll(List<StockSeries> all,
+      {int lookbackYears = 1}) {
     final out = <ScreenedStock>[];
     for (final s in all) {
       if (s.closes.length < 90) continue;
-      out.add(_scoreOne(s));
+      out.add(_scoreOne(s, lookbackYears));
     }
     return out;
   }
@@ -115,8 +129,10 @@ class Screener {
       if (f.maxPer != null && e.per != null && e.per! > f.maxPer!) return false;
       if (e.divStreak < f.minDivYears) return false;
       if (f.maxDistMa60 != null && e.distMa60 > f.maxDistMa60!) return false;
-      if (f.maxDrawdown1y != null && e.mdd1y > f.maxDrawdown1y!) return false;
+      if (f.maxDrawdown1y != null && e.mddWindow > f.maxDrawdown1y!) return false;
       if (e.score < f.minScore) return false;
+      if (f.minPrice > 0 && e.close < f.minPrice) return false;
+      if (f.maxPrice != null && e.close > f.maxPrice!) return false;
       return true;
     }).toList();
 
@@ -128,7 +144,7 @@ class Screener {
         list.sort((a, b) => (a.per ?? 9999).compareTo(b.per ?? 9999));
         break;
       case 'drawdown':
-        list.sort((a, b) => a.mdd1y.compareTo(b.mdd1y));
+        list.sort((a, b) => a.mddWindow.compareTo(b.mddWindow));
         break;
       case 'eps':
         list.sort((a, b) => (b.epsCagr3y ?? -999).compareTo(a.epsCagr3y ?? -999));
@@ -139,7 +155,7 @@ class Screener {
     return list;
   }
 
-  static ScreenedStock _scoreOne(StockSeries s) {
+  static ScreenedStock _scoreOne(StockSeries s, int lookbackYears) {
     final i = s.closes.length - 1;
     final close = s.closes[i];
     final y = s.yieldAt(i);
@@ -177,8 +193,11 @@ class Screener {
       }
     }
 
-    // 近一年最大回撤
-    final from = math.max(0, s.closes.length - 252);
+    // 統計窗口內最大回撤。每年以 244 個交易日計（台股實際約 243～246）。
+    final winLabel = lookbackYears <= 0 ? '全部歷史' : '近 $lookbackYears 年';
+    final from = lookbackYears <= 0
+        ? 0
+        : math.max(0, s.closes.length - lookbackYears * 244);
     var peak = s.closes[from];
     var mdd = 0.0;
     for (var k = from; k < s.closes.length; k++) {
@@ -186,7 +205,7 @@ class Screener {
       final dd = peak <= 0 ? 0.0 : (peak - s.closes[k]) / peak;
       if (dd > mdd) mdd = dd;
     }
-    final mdd1y = mdd * 100;
+    final mddWindow = mdd * 100;
 
     // 距季線
     final from60 = math.max(0, s.closes.length - 60);
@@ -199,7 +218,7 @@ class Screener {
     final sPer = _scorePer(perRatio);
     final sDiv = _scoreDiv(streak, s.dividends);
     final sGrowth = _scoreGrowth(epsCagr);
-    final sRisk = _scoreRisk(mdd1y);
+    final sRisk = _scoreRisk(mddWindow);
 
     final total = sYield * 0.25 + sPer * 0.20 + sDiv * 0.20 + sGrowth * 0.20 + sRisk * 0.15;
 
@@ -247,8 +266,8 @@ class Screener {
           ? '近 3 年 EPS 年複合成長 ${epsCagr.toStringAsFixed(1)}%'
           : '近 3 年 EPS 年複合成長 ${epsCagr.toStringAsFixed(1)}%（衰退）');
     }
-    reasons.add('近一年最大回撤 ${mdd1y.toStringAsFixed(1)}%'
-        '${mdd1y >= 35 ? '，波動偏大，投入節奏要放慢' : ''}');
+    reasons.add('$winLabel最大回撤 ${mddWindow.toStringAsFixed(1)}%'
+        '${mddWindow >= 35 ? '，波動偏大，投入節奏要放慢' : ''}');
     reasons.add('目前股價${distMa60 >= 0 ? '高於' : '低於'}季線 ${distMa60.abs().toStringAsFixed(1)}%');
 
     return ScreenedStock(
@@ -260,7 +279,7 @@ class Screener {
       perRatio: perRatio,
       divStreak: streak,
       epsCagr3y: epsCagr,
-      mdd1y: mdd1y,
+      mddWindow: mddWindow,
       distMa60: distMa60,
       score: total,
       parts: parts,
