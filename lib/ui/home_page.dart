@@ -21,9 +21,11 @@ import '../services/strategy_store.dart';
 import '../agents/agents.dart';
 import 'accounts_page.dart';
 import 'daily_picks_page.dart';
+import 'holdings_page.dart';
 import 'learn_page.dart';
 import 'market_page.dart';
 import 'paper_page.dart';
+import 'recommendations_page.dart';
 import 'result_page.dart';
 import 'screener_page.dart';
 import 'stock_profile_page.dart';
@@ -218,6 +220,16 @@ class _HomePageState extends State<HomePage> {
       case 'accounts':
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const AccountsPage()),
+        );
+        break;
+      case 'holdings':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const HoldingsPage()),
+        );
+        break;
+      case 'recommendations':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const RecommendationsPage()),
         );
         break;
       case 'stock':
@@ -517,41 +529,70 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: ActionButton(
-                  label: '學習路徑',
-                  sub: '8 堂課・做中學',
-                  icon: Icons.school_rounded,
-                  primary: false,
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const LearnPage()),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ActionButton(
+                      label: '學習路徑',
+                      sub: '8 堂課・做中學',
+                      icon: Icons.school_rounded,
+                      primary: false,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const LearnPage()),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ActionButton(
+                      label: '新增策略',
+                      icon: Icons.add_rounded,
+                      primary: false,
+                      onPressed: () async {
+                        final r = await Navigator.of(context).push<TradeStrategy>(
+                          MaterialPageRoute(
+                              builder: (_) => const StrategyEditorPage(origin: null)),
+                        );
+                        if (r != null) setState(() {});
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ActionButton(
-                  label: '新增策略',
-                  icon: Icons.add_rounded,
-                  primary: false,
-                  onPressed: () async {
-                    final r = await Navigator.of(context).push<TradeStrategy>(
-                      MaterialPageRoute(
-                          builder: (_) => const StrategyEditorPage(origin: null)),
-                    );
-                    if (r != null) setState(() {});
-                  },
-                ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ActionButton(
+                      label: '我的持股',
+                      sub: '股數＋買進價・看損益佔比',
+                      icon: Icons.pie_chart_rounded,
+                      primary: false,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const HoldingsPage()),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ActionButton(
+                      label: '建議記錄',
+                      sub: '助手精選池＋我的觀察',
+                      icon: Icons.lightbulb_outline_rounded,
+                      primary: false,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const RecommendationsPage()),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
+        );
+      }
 
   Widget _pickStockCard() {
     final series = MarketRepository.instance.series(_stockId);
