@@ -21,6 +21,7 @@ import '../services/strategy_store.dart';
 import '../agents/agents.dart';
 import 'accounts_page.dart';
 import 'daily_picks_page.dart';
+import 'family_lists_page.dart';
 import 'holdings_page.dart';
 import 'learn_page.dart';
 import 'market_page.dart';
@@ -230,6 +231,11 @@ class _HomePageState extends State<HomePage> {
       case 'recommendations':
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const RecommendationsPage()),
+        );
+        break;
+      case 'family':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const FamilyListsPage()),
         );
         break;
       case 'stock':
@@ -588,6 +594,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 10),
+              ActionButton(
+                label: '家族清單',
+                sub: '媽媽 24 檔・爸爸 32 檔・建議 21 檔',
+                icon: Icons.family_restroom_rounded,
+                primary: false,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const FamilyListsPage()),
+                ),
               ),
             ],
           ),

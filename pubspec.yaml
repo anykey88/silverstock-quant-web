@@ -1,7 +1,7 @@
 name: silverstock_quant_web
 description: SilverStock-Quant-Web — 面向台胞银发存股族的台股多 Agent 量化研究网页工具（WorkBuddy 1024 造物挑战参赛作品）
 publish_to: 'none'
-version: 2.5.0+25
+version: 2.6.0+26
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -26,3 +26,4 @@ flutter:
     - assets/data/recommendations.json
     - assets/data/margin.json
     - assets/data/live.json
+    - assets/data/family_lists.json
