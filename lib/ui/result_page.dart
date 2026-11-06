@@ -131,12 +131,13 @@ class _ResultPageState extends State<ResultPage> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          IconButton(
-            tooltip: '回到首頁',
-            iconSize: 30,
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
+          if (!isRootRoute(context))
+            IconButton(
+              tooltip: '回到首頁',
+              iconSize: 30,
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
           const SizedBox(width: 2),
           Expanded(
             child: Column(
@@ -303,6 +304,15 @@ class _ResultPageState extends State<ResultPage> {
     final f = r.fundamental;
     if (f == null) return const SizedBox.shrink();
     final years = f.annualEps.keys.toList()..sort();
+
+    // V2.7：依「實際原因」決定缺值文案，只有在有明確證據時才加括號說明。
+    // 近四季 EPS 合計為負 → 本益比標「虧損」；否則一律中性 N/A（含 ETF）。
+    final bool epsNegative = f.ttmEps != null && f.ttmEps! < 0;
+    final peReason = epsNegative ? NaReason.loss : NaReason.noData;
+    // 確定沒有任何現金股利紀錄 → 殖利率標「未配息」；否則中性 N/A。
+    final bool noDividend = f.recentDividends.isEmpty;
+    final yReason = noDividend ? NaReason.noDividend : NaReason.noData;
+
     return SectionCard(
       title: '基本面摘要',
       icon: Icons.receipt_long_rounded,
@@ -313,21 +323,26 @@ class _ResultPageState extends State<ResultPage> {
           _metricsRow([
             MetricTile(
               label: '殖利率（近 12 個月）',
-              value: f.yieldRate == null ? '—' : pct(f.yieldRate!),
+              value: fmtYield(f.yieldRate, reason: yReason),
               note: '現金股利 ÷ 股價',
               color: AppColors.gold,
+              tooltip: (f.yieldRate == null || f.yieldRate! <= 0)
+                  ? naTip(yReason)
+                  : null,
             ),
             MetricTile(
               label: '本益比',
-              value: f.per == null ? '—' : f.per!.toStringAsFixed(2),
-              note: f.per == null ? 'ETF 無此資料' : '資料日 ${f.perDate}',
+              value: fmtPe(f.per, reason: peReason),
+              note: f.per == null ? '無本益比資料' : '資料日 ${f.perDate}',
               color: AppColors.primary,
+              tooltip: (f.per == null || f.per! <= 0) ? naTip(peReason) : null,
             ),
             MetricTile(
               label: '股價淨值比',
-              value: f.pbr == null ? '—' : f.pbr!.toStringAsFixed(2),
-              note: f.pbr == null ? 'ETF 無此資料' : '每股淨值的倍數',
+              value: fmtPb(f.pbr),
+              note: f.pbr == null ? '無股淨比資料' : '每股淨值的倍數',
               color: AppColors.primary,
+              tooltip: f.pbr == null || f.pbr! <= 0 ? kPbNaTip : null,
             ),
           ]),
           const SizedBox(height: 14),

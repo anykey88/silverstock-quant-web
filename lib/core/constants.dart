@@ -6,7 +6,7 @@
 // ============================================================================
 
 /// 版本号。顯示於首頁右上角。
-const String kAppVersion = 'v2.6.0';
+const String kAppVersion = 'v2.7.0';
 
 /// 資料來源標註。
 const String kDataSourceNote =

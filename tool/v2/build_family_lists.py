@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""產出 assets/data/family_lists.json（家族三份清單）。
+"""產出 assets/data/family_lists.json（三份觀察清單）。
 
 設計：
-  · 名單成員（誰在媽媽／爸爸／建議清單）由 tool/v2/family_lists_src.json 維護，
+  · 名單成員（清單甲／清單乙／共同關注）由 tool/v2/family_lists_src.json 維護，
     助手改名單只改這個檔，不碰程式。
+  · 清單標題採中性代號（去識別化），避免對外暴露家人身份與持股歸屬。
   · 現價／漲跌每天由證交所 MIS 公開端點抓取（不用 key、不限次數），
     與 fetch_live.py 同一條路；抓不到時退回 src 裡記錄的收盤價，不會開天窗。
   · 殖利率／本益比／股淨比變動慢，沿用 src 記錄值；若 daily_picks.json 有同檔
@@ -40,6 +41,21 @@ def load_json(path):
 
 def to_channel(sid):
     return f"tse_{sid}.tw|otc_{sid}.tw"
+
+
+def norm_metric(v):
+    """V2.7：指標哨兵正規化——None／空／0／負值一律視為「缺資料」。
+
+    這樣 Flutter 端 fmtYield/fmtPe/fmtPb 就能可靠區分
+    「未配息」與「虧損（EPS 為負）」，不再把 0.0 與 null 混用。
+    """
+    if v is None or v == "":
+        return None
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return round(f, 4) if f > 0 else None
 
 
 def fetch_batch(ids):
@@ -151,6 +167,11 @@ def main():
                 yield_v = pk.get("yield", yield_v)
                 pe_v = pk.get("pe", pe_v)
                 pb_v = pk.get("pb", pb_v)
+
+            # V2.7：統一哨兵——0／負值視為缺資料，避免 N/A 語意混淆
+            yield_v = norm_metric(yield_v)
+            pe_v = norm_metric(pe_v)
+            pb_v = norm_metric(pb_v)
 
             row = {
                 "id": sid,

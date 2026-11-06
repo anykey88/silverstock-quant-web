@@ -8,6 +8,7 @@ import '../engine/screener.dart';
 import '../models/trade_strategy.dart';
 import '../services/strategy_store.dart';
 import '../ui/result_page.dart';
+import '../ui/stock_detail_page.dart';
 import '../ui/trade_result_page.dart';
 import '../ui/widgets.dart';
 
@@ -109,13 +110,14 @@ class _ScreenerPageState extends State<ScreenerPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
-        children: [
-          IconButton(
-            iconSize: 30,
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
+          children: [
+            if (!isRootRoute(context))
+              IconButton(
+                iconSize: 30,
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+            Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -462,8 +464,10 @@ class _ScreenerPageState extends State<ScreenerPage> {
                       spacing: 8,
                       runSpacing: 6,
                       children: [
-                        _kv('殖利率', pct(s.yieldRate, digits: 2)),
-                        _kv('本益比', s.per == null ? '—' : s.per!.toStringAsFixed(1)),
+                        _kv('殖利率', fmtYield(s.yieldRate),
+                            tooltip: s.yieldRate <= 0 ? kNoDataTip : null),
+                        _kv('本益比', fmtPe(s.per),
+                            tooltip: s.per == null || s.per! <= 0 ? kNoDataTip : null),
                         _kv('配息', '${s.divStreak} 年'),
                         _kv('距季線', signedPct(s.distMa60)),
                         _kv(_f.lookbackYears <= 0
@@ -571,13 +575,24 @@ class _ScreenerPageState extends State<ScreenerPage> {
               ),
             ),
           ],
+          // V2.7：個股詳情頁入口
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => StockDetailPage(stockId: s.series.id),
+              )),
+              icon: const Icon(Icons.candlestick_chart_rounded, size: 17),
+              label: const Text('查看個股詳情'),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _kv(String k, String v) {
-    return Container(
+  Widget _kv(String k, String v, {String? tooltip}) {
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: isHighContrast ? Colors.black : const Color(0xFFF2EEE3),
@@ -587,6 +602,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
           style: TextStyle(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: cInk)),
     );
+    return tooltip == null ? chip : Tooltip(message: tooltip, child: chip);
   }
 
   Future<void> _openTrade(ScreenedStock s) async {

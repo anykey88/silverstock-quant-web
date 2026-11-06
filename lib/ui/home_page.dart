@@ -583,7 +583,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ActionButton(
-                      label: '建議記錄',
+                      label: '觀察清單',
                       sub: '助手精選池＋我的觀察',
                       icon: Icons.lightbulb_outline_rounded,
                       primary: false,
@@ -597,8 +597,8 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 10),
               ActionButton(
-                label: '家族清單',
-                sub: '媽媽 24 檔・爸爸 32 檔・建議 21 檔',
+                label: '觀察清單',
+                sub: '清單甲 24 檔・清單乙 32 檔・共同關注 21 檔',
                 icon: Icons.family_restroom_rounded,
                 primary: false,
                 onPressed: () => Navigator.of(context).push(
