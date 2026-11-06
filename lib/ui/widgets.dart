@@ -17,6 +17,9 @@ Color get cSurface => isHighContrast ? AppColors.hcSurface : AppColors.surface;
 Color get cLine => isHighContrast ? AppColors.hcLine : AppColors.line;
 Color get cPrimary => isHighContrast ? AppColors.hcPrimary : AppColors.primary;
 
+/// V2.7：是否為根路由（首頁）。根路由不顯示返回箭頭，避免點了沒反應。
+bool isRootRoute(BuildContext context) => ModalRoute.of(context)?.isFirst ?? false;
+
 /// v2.2：警語橫幅已移除，保留空殼。
 /// v2.2：警語橫幅已移除。保留空殼是為了不讓 11 個頁面的引用整批失效。
 class DisclaimerBanner extends StatelessWidget {
@@ -92,6 +95,7 @@ class MetricTile extends StatelessWidget {
   final String? note;
   final Color color;
   final bool big;
+  final String? tooltip;
 
   const MetricTile({
     Key? key,
@@ -100,10 +104,35 @@ class MetricTile extends StatelessWidget {
     this.note,
     this.color = AppColors.primary,
     this.big = false,
+    this.tooltip,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final col = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label,
+            style: TextStyle(
+                fontSize: 14, color: cInkSoft, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(value,
+              style: TextStyle(
+                  fontSize: big ? 30 : 24,
+                  fontWeight: FontWeight.w900,
+                  color: color,
+                  height: 1.1)),
+        ),
+        if (note != null) ...[
+          const SizedBox(height: 2),
+          Text(note!, style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+        ],
+      ],
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
@@ -112,30 +141,9 @@ class MetricTile extends StatelessWidget {
         border: Border.all(
             color: isHighContrast ? color : color.withOpacity(0.25), width: 1.4),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: 14, color: cInkSoft, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(value,
-                style: TextStyle(
-                    fontSize: big ? 30 : 24,
-                    fontWeight: FontWeight.w900,
-                    color: color,
-                    height: 1.1)),
-          ),
-          if (note != null) ...[
-            const SizedBox(height: 2),
-            Text(note!, style: TextStyle(fontSize: 12.5, color: cInkSoft)),
-          ],
-        ],
-      ),
+      child: (tooltip != null && tooltip!.isNotEmpty)
+          ? Tooltip(message: tooltip!, child: col)
+          : col,
     );
   }
 }

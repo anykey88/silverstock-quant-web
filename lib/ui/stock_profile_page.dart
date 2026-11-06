@@ -113,11 +113,12 @@ class _StockProfilePageState extends State<StockProfilePage> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          IconButton(
-            iconSize: 30,
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
+          if (!isRootRoute(context))
+            IconButton(
+              iconSize: 30,
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,6 +218,12 @@ class _StockProfilePageState extends State<StockProfilePage> {
     final y = s.yieldAt(n - 1);
     final per = s.latestPer?.per;
 
+    // V2.7：依實際原因決定缺值文案；ETF 等無本益比者只顯示中性 N/A。
+    final bool epsNegative = s.ttmEps != null && s.ttmEps! < 0;
+    final peReason = epsNegative ? NaReason.loss : NaReason.noData;
+    final bool noDividend = s.dividends.isEmpty;
+    final yReason = noDividend ? NaReason.noDividend : NaReason.noData;
+
     return SectionCard(
       title: '關鍵數據',
       icon: Icons.insights_rounded,
@@ -234,17 +241,19 @@ class _StockProfilePageState extends State<StockProfilePage> {
                     width: w,
                     child: MetricTile(
                       label: '殖利率',
-                      value: pct(y, digits: 2),
+                      value: fmtYield(y, reason: yReason),
                       note: '近 12 個月現金股利 ÷ 股價',
                       color: AppColors.gold,
+                      tooltip: y <= 0 ? naTip(yReason) : null,
                     )),
                 SizedBox(
                     width: w,
                     child: MetricTile(
                       label: '本益比',
-                      value: per == null ? '—' : per.toStringAsFixed(1),
-                      note: per == null ? 'ETF 無此資料' : '資料日 ${s.latestPer!.date}',
+                      value: fmtPe(per, reason: peReason),
+                      note: per == null ? '無本益比資料' : '資料日 ${s.latestPer!.date}',
                       color: AppColors.primary,
+                      tooltip: (per == null || per <= 0) ? naTip(peReason) : null,
                     )),
                 SizedBox(
                     width: w,

@@ -8,9 +8,11 @@
 // 原則：**區間不是目標價，觸發條件不是預測**。它們只是把「什麼情況才算數」寫清楚。
 import 'package:flutter/material.dart';
 
+import '../core/formatters.dart';
 import '../services/daily_picks.dart';
 import '../services/stock_index.dart';
 import '../services/watchlist.dart';
+import '../ui/stock_detail_page.dart';
 import '../ui/stock_profile_page.dart';
 import '../ui/widgets.dart';
 import 'theme.dart';
@@ -56,10 +58,13 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('每日精選'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        automaticallyImplyLeading: !isRootRoute(context),
+        leading: isRootRoute(context)
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
       ),
       body: SafeArea(
         bottom: false,
@@ -395,11 +400,22 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
                     spacing: 8,
                     runSpacing: 6,
                     children: [
-                      _chip('本益比 ${it.per == null ? '—' : it.per!.toStringAsFixed(1)}'),
+                      (it.per == null || it.per! <= 0)
+                          ? Tooltip(
+                              message: kNoDataTip,
+                              child: _chip('本益比 ${fmtPe(it.per)}'),
+                            )
+                          : _chip('本益比 ${fmtPe(it.per)}'),
                       _chip('分位 ${it.perPct == null ? '—' : '${it.perPct!.toStringAsFixed(0)}%'}',
                           strong: !isTrim && (it.perPct ?? 100) <= 40),
-                      _chip('殖利率 ${it.yieldPct == null ? '—' : '${it.yieldPct!.toStringAsFixed(1)}%'}',
-                          strong: !isTrim && (it.yieldPct ?? 0) >= 4),
+                      (it.yieldPct == null || it.yieldPct! <= 0)
+                          ? Tooltip(
+                              message: kNoDataTip,
+                              child: _chip('殖利率 ${fmtYield(it.yieldPct)}',
+                                  strong: !isTrim && (it.yieldPct ?? 0) >= 4),
+                            )
+                          : _chip('殖利率 ${fmtYield(it.yieldPct)}',
+                              strong: !isTrim && (it.yieldPct ?? 0) >= 4),
                       _chip('財檢 ${it.finScore ?? '—'}',
                           strong: (it.finScore ?? 0) >= 70),
                       _chip(
@@ -560,6 +576,17 @@ class _DailyPicksPageState extends State<DailyPicksPage> {
                 ),
               ),
             ],
+          ),
+          // V2.7：個股詳情頁入口（走勢／股利／填息／殖利率區間／EPS）
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => StockDetailPage(stockId: it.id),
+              )),
+              icon: const Icon(Icons.candlestick_chart_rounded, size: 17),
+              label: const Text('查看個股詳情'),
+            ),
           ),
         ],
       ),

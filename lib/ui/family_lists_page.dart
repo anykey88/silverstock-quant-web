@@ -1,8 +1,9 @@
-// 家族清單：媽媽／爸爸／建議 三份清單，一頁看完
+// 三份觀察清單（清單甲／清單乙／共同關注），一頁看完
 import 'package:flutter/material.dart';
 
 import '../core/formatters.dart';
 import '../services/family_lists.dart';
+import '../ui/stock_detail_page.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
 
@@ -123,19 +124,20 @@ class _FamilyListsPageState extends State<FamilyListsPage> {
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
-            IconButton(
-              iconSize: 30,
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back_rounded),
-            ),
+            if (!isRootRoute(context))
+              IconButton(
+                iconSize: 30,
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('家族清單',
+                  Text('觀察清單',
                       style: TextStyle(
                           fontSize: 21, fontWeight: FontWeight.w900, color: cInk)),
-                  Text('媽媽・爸爸・建議 三份清單，每日更新',
+                  Text('清單甲・清單乙・共同關注 三份清單，每日更新',
                       style: TextStyle(fontSize: 12.5, color: cInkSoft)),
                 ],
               ),
@@ -179,13 +181,15 @@ class _FamilyListsPageState extends State<FamilyListsPage> {
   }
 
   String _shortName(String key, String title) {
+    // 標題一律以資料檔為準（清單甲／清單乙／共同關注），
+    // 避免對外暴露家人身份；舊資料若仍含舊稱謂也不顯示。
     switch (key) {
       case 'mom':
-        return '媽媽';
+        return title.contains('清單') ? title : '清單甲';
       case 'dad':
-        return '爸爸';
+        return title.contains('清單') ? title : '清單乙';
       case 'adv':
-        return '建議';
+        return title.contains('建議') ? '共同關注' : title;
       default:
         return title;
     }
@@ -329,84 +333,99 @@ class _FamilyListsPageState extends State<FamilyListsPage> {
     final col = it.pct > 0
         ? AppColors.up
         : (it.pct < 0 ? AppColors.down : AppColors.inkSoft);
-    final peOk = it.pe != null && it.pe! > 0;
-    final pbOk = it.pb != null && it.pb! > 0;
-    final yOk = it.yieldPct != null && it.yieldPct! > 0;
+    final yStr = fmtYield(it.yieldPct);
+    final peStr = fmtPe(it.pe);
+    final pbStr = fmtPb(it.pb);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cLine),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${it.name}（${it.id}）',
-                        style: TextStyle(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w900,
-                            color: cInk)),
-                    const SizedBox(height: 2),
-                    Text(
-                        '${it.industry}${it.group.isEmpty ? '' : '・${it.group}'}',
-                        style: TextStyle(fontSize: 12.5, color: cInkSoft)),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(it.close > 0 ? it.close.toStringAsFixed(2) : '—',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: cInk)),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => StockDetailPage(stockId: it.id),
+      )),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: cLine),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        it.pct > 0
-                            ? Icons.arrow_upward_rounded
-                            : (it.pct < 0
-                                ? Icons.arrow_downward_rounded
-                                : Icons.remove_rounded),
-                        size: 13,
-                        color: col,
-                      ),
+                      Text('${it.name}（${it.id}）',
+                          style: TextStyle(
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.w900,
+                              color: cInk)),
+                      const SizedBox(height: 2),
                       Text(
-                        '${it.change >= 0 ? '+' : ''}${it.change.toStringAsFixed(2)}'
-                        '　${signedPct(it.pct, digits: 2)}',
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: col),
-                      ),
+                          '${it.industry}${it.group.isEmpty ? '' : '・${it.group}'}',
+                          style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+                      const SizedBox(height: 4),
+                      Text('點擊查看走勢・股利・填息・EPS',
+                          style: TextStyle(
+                              fontSize: 11.5,
+                              color: cPrimary,
+                              fontWeight: FontWeight.w600)),
                     ],
                   ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _kv('殖利率', yOk ? pct(it.yieldPct!, digits: 2) : '—'),
-              _kv('本益比', peOk ? it.pe!.toStringAsFixed(1) : '—'),
-              _kv('股淨比', pbOk ? it.pb!.toStringAsFixed(2) : '—'),
-              if (it.status.isNotEmpty)
-                _kv('狀態', it.status, color: _statusColor(it.status)),
-            ],
-          ),
-        ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(it.close > 0 ? it.close.toStringAsFixed(2) : '—',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: cInk)),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          it.pct > 0
+                              ? Icons.arrow_upward_rounded
+                              : (it.pct < 0
+                                  ? Icons.arrow_downward_rounded
+                                  : Icons.remove_rounded),
+                          size: 13,
+                          color: col,
+                        ),
+                        Text(
+                          '${it.change >= 0 ? '+' : ''}${it.change.toStringAsFixed(2)}'
+                          '　${signedPct(it.pct, digits: 2)}',
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: col),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _kv('殖利率', yStr,
+                    tooltip: yStr.startsWith('N/A') ? kNoDataTip : null),
+                _kv('本益比', peStr,
+                    tooltip: peStr.startsWith('N/A') ? kNoDataTip : null),
+                _kv('股淨比', pbStr,
+                    tooltip: pbStr.startsWith('N/A') ? kPbNaTip : null),
+                if (it.status.isNotEmpty)
+                  _kv('狀態', it.status, color: _statusColor(it.status)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -422,20 +441,23 @@ class _FamilyListsPageState extends State<FamilyListsPage> {
     }
   }
 
-  Widget _kv(String k, String v, {Color? color}) => Padding(
-        padding: const EdgeInsets.only(right: 16, bottom: 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(k, style: TextStyle(fontSize: 11, color: cInkSoft)),
-            Text(v,
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: color ?? cInk)),
-          ],
-        ),
-      );
+  Widget _kv(String k, String v, {Color? color, String? tooltip}) {
+    final tile = Padding(
+      padding: const EdgeInsets.only(right: 16, bottom: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(k, style: TextStyle(fontSize: 11, color: cInkSoft)),
+          Text(v,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: color ?? cInk)),
+        ],
+      ),
+    );
+    return tooltip == null ? tile : Tooltip(message: tooltip, child: tile);
+  }
 
   Widget _footNote() {
     final d = _data;
@@ -443,7 +465,7 @@ class _FamilyListsPageState extends State<FamilyListsPage> {
         ? ''
         : '資料日 ${d.generatedAt}・清單版本 ${d.updatedAt}。'
             '價格來自證交所公開資訊，收盤後更新；盤中可能延遲。'
-            '本頁只整理家人自選股與助手觀察，不構成買賣建議。';
+            '本頁只整理自選標的與助手觀察，不構成買賣建議。';
     if (text.isEmpty) return const SizedBox.shrink();
     return Text(text,
         style: TextStyle(fontSize: 12, height: 1.6, color: cInkSoft));

@@ -8,6 +8,7 @@ import '../services/remote_stock_service.dart';
 import '../services/stock_index.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
+import 'stock_detail_page.dart';
 import 'stock_profile_page.dart';
 
 class RecommendationsPage extends StatefulWidget {
@@ -359,16 +360,17 @@ class _RecommendationsPageState extends State<RecommendationsPage> {
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
-            IconButton(
-              iconSize: 30,
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back_rounded),
-            ),
+            if (!isRootRoute(context))
+              IconButton(
+                iconSize: 30,
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('建議記錄',
+                  Text('觀察清單',
                       style: TextStyle(
                           fontSize: 21, fontWeight: FontWeight.w900, color: cInk)),
                   Text('助手精選池・你也能加本機觀察',
@@ -575,6 +577,17 @@ class _RecommendationsPageState extends State<RecommendationsPage> {
                 ],
               ),
             ],
+            // V2.7：個股詳情頁入口（無歷史快照者亦可進，顯示「資料待補」骨架）
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => StockDetailPage(stockId: it.id),
+                )),
+                icon: const Icon(Icons.candlestick_chart_rounded, size: 17),
+                label: const Text('查看個股詳情'),
+              ),
+            ),
           ],
         ),
       ),

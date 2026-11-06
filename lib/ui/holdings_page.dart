@@ -7,6 +7,7 @@ import '../services/account_export.dart';
 import '../services/holdings.dart';
 import '../services/remote_stock_service.dart';
 import '../services/stock_index.dart';
+import '../ui/stock_detail_page.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
 
@@ -434,11 +435,12 @@ class _HoldingsPageState extends State<HoldingsPage> {
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
-            IconButton(
-              iconSize: 30,
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back_rounded),
-            ),
+            if (!isRootRoute(context))
+              IconButton(
+                iconSize: 30,
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -574,39 +576,60 @@ class _HoldingsPageState extends State<HoldingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          InkWell(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => StockDetailPage(stockId: h.id),
+            )),
+            borderRadius: BorderRadius.circular(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
                   children: [
-                    Text('${h.name}（${h.id}）',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w900, color: cInk)),
-                    Text('${h.industry}・${h.shares} 股',
-                        style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${h.name}（${h.id}）',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                  color: cInk)),
+                          Text('${h.industry}・${h.shares} 股',
+                              style: TextStyle(fontSize: 12.5, color: cInkSoft)),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(money(pnl),
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: pnlCol)),
+                        Text(signedPct(pnlPct),
+                            style: TextStyle(fontSize: 12, color: pnlCol)),
+                      ],
+                    ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(money(pnl),
-                      style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w900, color: pnlCol)),
-                  Text(signedPct(pnlPct),
-                      style: TextStyle(fontSize: 12, color: pnlCol)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _kv('買進價', h.costPrice > 0 ? h.costPrice.toStringAsFixed(2) : '—'),
-              _kv('現價', px > 0 ? px.toStringAsFixed(2) : '—'),
-              _kv('市值', money(mv)),
-            ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _kv('買進價', h.costPrice > 0 ? h.costPrice.toStringAsFixed(2) : '—'),
+                    _kv('現價', px > 0 ? px.toStringAsFixed(2) : '—'),
+                    _kv('市值', money(mv)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text('點擊查看走勢・股利・填息・EPS',
+                    style: TextStyle(
+                        fontSize: 11.5,
+                        color: cPrimary,
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
           ),
           const SizedBox(height: 6),
           Row(
