@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-11",
+  "generated_at": "2026-11-12",
   "updated_at": "2026-11-01",
   "source": "curated+ci",
   "note": "本池由助手依「防禦逆向收息」主軸挑選，分三類：防禦核心（低波動、穩定配息、內需為主）、逆向收息（股價回檔後具收息與修復價值）、衛星觀察（體質佳但波動大，等外資空單鬆動再考慮）。買區／減碼區為助手設定的參考價位，狀態由每日掃描依現價自動更新。這不是買賣指令，請結合自身風險承受度與資金配置決定。",
@@ -71,10 +71,10 @@
       "buyHigh": 75.0,
       "trimLow": 82.0,
       "trimHigh": 88.0,
-      "close": 76.8,
+      "close": 77.9,
       "status": "觀察中",
       "tone": "watch",
-      "gapPct": 2.4
+      "gapPct": 3.87
     },
     {
       "id": "1232",
@@ -179,10 +179,10 @@
       "buyHigh": 65.0,
       "trimLow": 80.0,
       "trimHigh": 90.0,
-      "close": 73.5,
+      "close": 71.2,
       "status": "觀察中",
       "tone": "watch",
-      "gapPct": 13.08
+      "gapPct": 9.54
     },
     {
       "id": "1476",
@@ -215,10 +215,10 @@
       "buyHigh": 195.0,
       "trimLow": 230.0,
       "trimHigh": 265.0,
-      "close": 173.5,
+      "close": 168.0,
       "status": "可建倉",
       "tone": "buy",
-      "gapPct": -11.03
+      "gapPct": -13.85
     },
     {
       "id": "2330",
@@ -233,10 +233,10 @@
       "buyHigh": 2150.0,
       "trimLow": 2500.0,
       "trimHigh": 2700.0,
-      "close": 2395.0,
+      "close": 2340.0,
       "status": "觀察中",
       "tone": "watch",
-      "gapPct": 11.4
+      "gapPct": 8.84
     },
     {
       "id": "9910",

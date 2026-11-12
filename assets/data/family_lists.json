@@ -19,7 +19,7 @@
           "close": 58.2,
           "change": -0.9,
           "pct": -1.52,
-          "yield": 3.38,
+          "yield": 3.44,
           "pe": 14.3,
           "pb": 0.68,
           "live": true
@@ -47,7 +47,7 @@
           "close": 2340.0,
           "change": -55.0,
           "pct": -2.3,
-          "yield": 0.92,
+          "yield": 0.94,
           "pe": 27.47,
           "pb": 9.55,
           "live": true
@@ -72,13 +72,13 @@
           "industry": "光電業",
           "category": "電子",
           "group": "群組二",
-          "close": 33.55,
-          "change": -1.95,
-          "pct": -5.49,
+          "close": 29.8,
+          "change": -1.55,
+          "pct": -4.94,
           "yield": null,
           "pe": 104.84,
           "pb": 1.93,
-          "live": false
+          "live": true
         },
         {
           "id": "2891",
@@ -86,13 +86,13 @@
           "industry": "金融保險",
           "category": "金融",
           "group": "群組三",
-          "close": 75.8,
-          "change": 0.5,
-          "pct": 0.66,
+          "close": 75.4,
+          "change": 0.7,
+          "pct": 0.94,
           "yield": 3.3,
           "pe": 18.13,
           "pb": 2.17,
-          "live": false
+          "live": true
         },
         {
           "id": "8284",
@@ -100,13 +100,13 @@
           "industry": "資訊服務業",
           "category": "電子",
           "group": "群組三",
-          "close": 67.2,
-          "change": 0.2,
-          "pct": 0.3,
+          "close": 65.6,
+          "change": -2.3,
+          "pct": -3.39,
           "yield": 5.96,
           "pe": 10.28,
           "pb": 2.38,
-          "live": false
+          "live": true
         },
         {
           "id": "1806",
@@ -131,7 +131,7 @@
           "close": 26.2,
           "change": -0.2,
           "pct": -0.76,
-          "yield": 2.12,
+          "yield": 2.14,
           "pe": 32.47,
           "pb": 0.48,
           "live": true
@@ -173,7 +173,7 @@
           "close": 33.2,
           "change": -0.85,
           "pct": -2.5,
-          "yield": 1.47,
+          "yield": 1.51,
           "pe": 10.89,
           "pb": 0.78,
           "live": true
@@ -229,7 +229,7 @@
           "close": 159.0,
           "change": -0.5,
           "pct": -0.31,
-          "yield": 2.66,
+          "yield": 2.67,
           "pe": 15.09,
           "pb": 1.99,
           "live": true
@@ -243,7 +243,7 @@
           "close": 112.0,
           "change": -1.0,
           "pct": -0.88,
-          "yield": 3.1,
+          "yield": 3.13,
           "pe": 13.68,
           "pb": 1.67,
           "live": true
@@ -285,7 +285,7 @@
           "close": 240.0,
           "change": -2.0,
           "pct": -0.83,
-          "yield": 2.96,
+          "yield": 2.99,
           "pe": 16.18,
           "pb": 1.8,
           "live": true
@@ -310,13 +310,13 @@
           "industry": "電腦及週邊設備業",
           "category": "電子",
           "group": "群組四",
-          "close": 26.9,
-          "change": -1.15,
-          "pct": -4.1,
+          "close": 24.4,
+          "change": -0.4,
+          "pct": -1.61,
           "yield": null,
           "pe": null,
           "pb": 1.12,
-          "live": false
+          "live": true
         },
         {
           "id": "2367",
@@ -338,13 +338,13 @@
           "industry": "通信網路業",
           "category": "電信網路",
           "group": "群組五",
-          "close": 38.2,
-          "change": -1.4,
-          "pct": -3.54,
+          "close": 34.0,
+          "change": -1.5,
+          "pct": -4.23,
           "yield": 1.23,
           "pe": 318.33,
           "pb": 1.53,
-          "live": false
+          "live": true
         }
       ]
     },
@@ -374,13 +374,13 @@
           "industry": "通信網路業",
           "category": "電信網路",
           "group": "群組一",
-          "close": 114.0,
-          "change": 1.0,
-          "pct": 0.88,
+          "close": 108.0,
+          "change": 0.0,
+          "pct": 0.0,
           "yield": 3.34,
           "pe": 27.74,
           "pb": 4.77,
-          "live": false
+          "live": true
         },
         {
           "id": "1101",
@@ -402,13 +402,13 @@
           "industry": "金融保險",
           "category": "金融",
           "group": "群組一",
-          "close": 42.25,
-          "change": -0.15,
-          "pct": -0.35,
+          "close": 39.75,
+          "change": -0.7,
+          "pct": -1.73,
           "yield": 2.6,
           "pe": 15.65,
           "pb": 1.56,
-          "live": false
+          "live": true
         },
         {
           "id": "1527",
@@ -430,13 +430,13 @@
           "industry": "貿易百貨",
           "category": "傳產",
           "group": "群組一",
-          "close": 11.0,
-          "change": -0.15,
-          "pct": -1.35,
+          "close": 10.1,
+          "change": 0.0,
+          "pct": 0.0,
           "yield": null,
           "pe": null,
           "pb": 0.7,
-          "live": false
+          "live": true
         },
         {
           "id": "2371",
@@ -461,7 +461,7 @@
           "close": 68.3,
           "change": -1.9,
           "pct": -2.71,
-          "yield": 0.71,
+          "yield": 0.73,
           "pe": 44.21,
           "pb": 0.8,
           "live": true
@@ -486,13 +486,13 @@
           "industry": "其他",
           "category": "傳產",
           "group": "群組一",
-          "close": 156.5,
-          "change": -4.5,
-          "pct": -2.8,
+          "close": 142.5,
+          "change": -0.5,
+          "pct": -0.35,
           "yield": null,
           "pe": 326.04,
           "pb": 7.92,
-          "live": false
+          "live": true
         },
         {
           "id": "6244",
@@ -500,13 +500,13 @@
           "industry": "光電業",
           "category": "電子",
           "group": "群組一",
-          "close": 20.0,
-          "change": -0.7,
-          "pct": -3.38,
+          "close": 21.2,
+          "change": -0.1,
+          "pct": -0.47,
           "yield": 0.7,
           "pe": 47.62,
           "pb": 1.7,
-          "live": false
+          "live": true
         },
         {
           "id": "1718",
@@ -528,13 +528,13 @@
           "industry": "光電業",
           "category": "電子",
           "group": "群組一",
-          "close": 23.55,
-          "change": -0.9,
-          "pct": -3.68,
+          "close": 28.0,
+          "change": 0.4,
+          "pct": 1.45,
           "yield": null,
           "pe": null,
           "pb": 3.62,
-          "live": false
+          "live": true
         },
         {
           "id": "00400A",
@@ -559,7 +559,7 @@
           "close": 30.0,
           "change": -1.15,
           "pct": -3.69,
-          "yield": 3.53,
+          "yield": 3.67,
           "pe": 17.69,
           "pb": 1.09,
           "live": true
@@ -570,13 +570,13 @@
           "industry": "光電業",
           "category": "電子",
           "group": "群組一",
-          "close": 13.3,
-          "change": -0.6,
-          "pct": -4.32,
+          "close": 12.55,
+          "change": -0.25,
+          "pct": -1.95,
           "yield": null,
           "pe": null,
           "pb": 1.02,
-          "live": false
+          "live": true
         },
         {
           "id": "2353",
@@ -612,13 +612,13 @@
           "industry": "電子零組件業",
           "category": "電子",
           "group": "群組一",
-          "close": 152.0,
-          "change": -12.0,
-          "pct": -7.32,
+          "close": 125.0,
+          "change": -6.0,
+          "pct": -4.58,
           "yield": null,
           "pe": null,
           "pb": 5.91,
-          "live": false
+          "live": true
         },
         {
           "id": "2409",
@@ -671,7 +671,7 @@
           "close": 35.35,
           "change": -0.55,
           "pct": -1.53,
-          "yield": 2.79,
+          "yield": 2.83,
           "pe": 13.22,
           "pb": 1.5,
           "live": true
@@ -724,13 +724,13 @@
           "industry": "電子商務業",
           "category": "電子",
           "group": "群組四",
-          "close": 23.25,
-          "change": -0.55,
-          "pct": -2.31,
+          "close": 22.65,
+          "change": 1.1,
+          "pct": 5.1,
           "yield": null,
           "pe": null,
           "pb": 0.72,
-          "live": false
+          "live": true
         },
         {
           "id": "00409A",
@@ -831,13 +831,13 @@
           "industry": "通信網路業",
           "category": "電信網路",
           "group": "共同關注",
-          "close": 114.0,
-          "change": 1.0,
-          "pct": 0.88,
+          "close": 108.0,
+          "change": 0.0,
+          "pct": 0.0,
           "yield": 3.34,
           "pe": 27.74,
           "pb": 4.77,
-          "live": false,
+          "live": true,
           "status": ""
         },
         {
@@ -849,7 +849,7 @@
           "close": 35.35,
           "change": -0.55,
           "pct": -1.53,
-          "yield": 2.79,
+          "yield": 2.83,
           "pe": 13.22,
           "pb": 1.5,
           "live": true,
@@ -876,13 +876,13 @@
           "industry": "光電業",
           "category": "電子",
           "group": "共同關注",
-          "close": 23.55,
-          "change": -0.9,
-          "pct": -3.68,
+          "close": 28.0,
+          "change": 0.4,
+          "pct": 1.45,
           "yield": null,
           "pe": null,
           "pb": 3.62,
-          "live": false,
+          "live": true,
           "status": ""
         },
         {
@@ -924,7 +924,7 @@
           "close": 30.0,
           "change": -1.15,
           "pct": -3.69,
-          "yield": 3.53,
+          "yield": 3.67,
           "pe": 17.69,
           "pb": 1.09,
           "live": true,
@@ -939,7 +939,7 @@
           "close": 77.9,
           "change": 1.1,
           "pct": 1.43,
-          "yield": 3.91,
+          "yield": 3.85,
           "pe": 19.37,
           "pb": 3.34,
           "live": true,
@@ -966,13 +966,13 @@
           "industry": "油電燃氣業",
           "category": "傳產",
           "group": "助手精選",
-          "close": 28.9,
-          "change": 0.1,
-          "pct": 0.35,
+          "close": 28.6,
+          "change": -0.05,
+          "pct": -0.17,
           "yield": 4.15,
           "pe": 13.76,
           "pb": 0.97,
-          "live": false,
+          "live": true,
           "status": "可建倉"
         },
         {
@@ -981,13 +981,13 @@
           "industry": "其他",
           "category": "傳產",
           "group": "助手精選",
-          "close": 69.8,
-          "change": 0.1,
-          "pct": 0.14,
+          "close": 64.7,
+          "change": -2.3,
+          "pct": -3.43,
           "yield": 5.87,
           "pe": 14.19,
           "pb": 2.91,
-          "live": false,
+          "live": true,
           "status": "可建倉"
         },
         {
@@ -1059,7 +1059,7 @@
           "close": 168.0,
           "change": -5.5,
           "pct": -3.17,
-          "yield": 2.88,
+          "yield": 2.98,
           "pe": 25.55,
           "pb": 2.5,
           "live": true,
@@ -1086,13 +1086,13 @@
           "industry": "油電燃氣業",
           "category": "傳產",
           "group": "助手精選",
-          "close": 48.65,
-          "change": -0.9,
-          "pct": -1.82,
+          "close": 49.15,
+          "change": 0.3,
+          "pct": 0.61,
           "yield": 4.32,
           "pe": 17.07,
           "pb": 1.97,
-          "live": false,
+          "live": true,
           "status": "可建倉"
         },
         {
@@ -1104,7 +1104,7 @@
           "close": 2340.0,
           "change": -55.0,
           "pct": -2.3,
-          "yield": 0.92,
+          "yield": 0.94,
           "pe": 27.47,
           "pb": 9.55,
           "live": true,
@@ -1119,7 +1119,7 @@
           "close": 71.2,
           "change": -2.3,
           "pct": -3.13,
-          "yield": 0.82,
+          "yield": 0.84,
           "pe": 30.72,
           "pb": 0.82,
           "live": true,
