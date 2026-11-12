@@ -1,0 +1,604 @@
+{
+  "version": "V5.2-step5",
+  "step": 5,
+  "title": "多段輪流考：不再只切一次",
+  "generated_at": "2026-11-11",
+  "source_files": [
+    "assets/data/snapshot.json",
+    "v40_execution_result.json",
+    "tool/v3/execution_lab.py"
+  ],
+  "setting": {
+    "symbol": "0050",
+    "train_init_bars": 500,
+    "test_len_bars": 120,
+    "step_bars": 120,
+    "window": "expanding（每次用前面全部資料挑參數）",
+    "n_candidates": 7,
+    "note": "候選參數、成本、訊號全部沿用 V4.0，沒有重新調整"
+  },
+  "n_folds": 7,
+  "folds": [
+    {
+      "train_range": [
+        20210601,
+        20230616
+      ],
+      "test_range": [
+        20230619,
+        20231211
+      ],
+      "n_train_bars": 500,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 0.61,
+      "rule_total_pct": -5.62,
+      "rule_mdd_pct": -8.39,
+      "rule_calmar": -1.34,
+      "rule_turnovers": 3,
+      "buyhold_total_pct": 1.27,
+      "buyhold_mdd_pct": -8.39,
+      "buyhold_calmar": 0.36,
+      "outperformance_pp": -6.89,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.18,
+          "total_pct": 4.83,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 0.61,
+          "total_pct": 17.14,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.35,
+          "total_pct": 9.44,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 0.36,
+          "total_pct": 9.89,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.02,
+          "total_pct": 0.59,
+          "mdd_pct": -21.45
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": -0.17,
+          "total_pct": -9.83,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": -0.22,
+          "total_pct": -16.34,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 1
+    },
+    {
+      "train_range": [
+        20210601,
+        20231211
+      ],
+      "test_range": [
+        20231212,
+        20240613
+      ],
+      "n_train_bars": 620,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 0.35,
+      "rule_total_pct": 38.91,
+      "rule_mdd_pct": -7.84,
+      "rule_calmar": 12.9,
+      "rule_turnovers": 1,
+      "buyhold_total_pct": 38.91,
+      "buyhold_mdd_pct": -7.84,
+      "buyhold_calmar": 12.9,
+      "outperformance_pp": 0.0,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.04,
+          "total_pct": 1.36,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 0.35,
+          "total_pct": 12.21,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.31,
+          "total_pct": 10.74,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 0.33,
+          "total_pct": 11.19,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.04,
+          "total_pct": 1.78,
+          "mdd_pct": -21.45
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": -0.12,
+          "total_pct": -8.77,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": -0.16,
+          "total_pct": -15.35,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 2
+    },
+    {
+      "train_range": [
+        20210601,
+        20240613
+      ],
+      "test_range": [
+        20240614,
+        20241209
+      ],
+      "n_train_bars": 740,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 1.21,
+      "rule_total_pct": 9.32,
+      "rule_mdd_pct": -21.7,
+      "rule_calmar": 0.97,
+      "rule_turnovers": 1,
+      "buyhold_total_pct": 9.32,
+      "buyhold_mdd_pct": -21.7,
+      "buyhold_calmar": 0.97,
+      "outperformance_pp": 0.0,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.92,
+          "total_pct": 41.33,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 1.21,
+          "total_pct": 56.45,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 1.17,
+          "total_pct": 54.4,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 1.18,
+          "total_pct": 55.03,
+          "mdd_pct": -13.72
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.59,
+          "total_pct": 41.92,
+          "mdd_pct": -21.45
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": 0.29,
+          "total_pct": 27.21,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": 0.15,
+          "total_pct": 18.03,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 3
+    },
+    {
+      "train_range": [
+        20210601,
+        20241209
+      ],
+      "test_range": [
+        20241210,
+        20250612
+      ],
+      "n_train_bars": 860,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 0.8,
+      "rule_total_pct": -3.93,
+      "rule_mdd_pct": -11.69,
+      "rule_calmar": -0.67,
+      "rule_turnovers": 2,
+      "buyhold_total_pct": -1.85,
+      "buyhold_mdd_pct": -28.47,
+      "buyhold_calmar": -0.13,
+      "outperformance_pp": -2.08,
+      "mdd_improvement_pp": 16.78,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.46,
+          "total_pct": 37.96,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 0.8,
+          "total_pct": 72.28,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.78,
+          "total_pct": 70.02,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 0.6,
+          "total_pct": 51.34,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.61,
+          "total_pct": 52.13,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": 0.35,
+          "total_pct": 40.07,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": 0.2,
+          "total_pct": 29.97,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 4
+    },
+    {
+      "train_range": [
+        20210601,
+        20250612
+      ],
+      "test_range": [
+        20250613,
+        20251203
+      ],
+      "n_train_bars": 980,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 0.62,
+      "rule_total_pct": 31.75,
+      "rule_mdd_pct": -8.03,
+      "rule_calmar": 9.94,
+      "rule_turnovers": 1,
+      "buyhold_total_pct": 31.75,
+      "buyhold_mdd_pct": -8.03,
+      "buyhold_calmar": 9.94,
+      "outperformance_pp": 0.0,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.38,
+          "total_pct": 36.03,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 0.62,
+          "total_pct": 63.21,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.34,
+          "total_pct": 43.19,
+          "mdd_pct": -28.47
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 0.45,
+          "total_pct": 43.38,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.27,
+          "total_pct": 33.35,
+          "mdd_pct": -28.83
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": 0.18,
+          "total_pct": 22.78,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": 0.16,
+          "total_pct": 26.83,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 5
+    },
+    {
+      "train_range": [
+        20210601,
+        20251203
+      ],
+      "test_range": [
+        20251204,
+        20260608
+      ],
+      "n_train_bars": 1100,
+      "n_test_bars": 120,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 0.89,
+      "rule_total_pct": 64.49,
+      "rule_mdd_pct": -10.84,
+      "rule_calmar": 17.31,
+      "rule_turnovers": 1,
+      "buyhold_total_pct": 64.49,
+      "buyhold_mdd_pct": -10.84,
+      "buyhold_calmar": 17.31,
+      "outperformance_pp": 0.0,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 0.66,
+          "total_pct": 79.48,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 0.89,
+          "total_pct": 115.5,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.55,
+          "total_pct": 89.06,
+          "mdd_pct": -28.47
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 0.67,
+          "total_pct": 80.6,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.48,
+          "total_pct": 75.93,
+          "mdd_pct": -28.83
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": 0.4,
+          "total_pct": 61.99,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": 0.32,
+          "total_pct": 67.34,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 6
+    },
+    {
+      "train_range": [
+        20210601,
+        20260608
+      ],
+      "test_range": [
+        20260609,
+        20261022
+      ],
+      "n_train_bars": 1220,
+      "n_test_bars": 93,
+      "best_param": "ma120",
+      "best_in_sample_calmar": 1.38,
+      "rule_total_pct": 3.7,
+      "rule_mdd_pct": -15.42,
+      "rule_calmar": 0.71,
+      "rule_turnovers": 1,
+      "buyhold_total_pct": 3.7,
+      "buyhold_mdd_pct": -15.42,
+      "buyhold_calmar": 0.71,
+      "outperformance_pp": 0.0,
+      "mdd_improvement_pp": 0.0,
+      "train_candidates": [
+        {
+          "kind": "ma60",
+          "th": 0,
+          "calmar": 1.16,
+          "total_pct": 195.17,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma120",
+          "th": 0,
+          "calmar": 1.38,
+          "total_pct": 254.41,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "ma240",
+          "th": 0,
+          "calmar": 0.93,
+          "total_pct": 210.92,
+          "mdd_pct": -28.47
+        },
+        {
+          "kind": "dd",
+          "th": 0.08,
+          "calmar": 1.14,
+          "total_pct": 190.32,
+          "mdd_pct": -21.7
+        },
+        {
+          "kind": "dd",
+          "th": 0.15,
+          "calmar": 0.85,
+          "total_pct": 189.33,
+          "mdd_pct": -28.83
+        },
+        {
+          "kind": "dd",
+          "th": 0.2,
+          "calmar": 0.76,
+          "total_pct": 166.4,
+          "mdd_pct": -29.59
+        },
+        {
+          "kind": "dd",
+          "th": 0.25,
+          "calmar": 0.59,
+          "total_pct": 175.2,
+          "mdd_pct": -39.75
+        }
+      ],
+      "fold": 7
+    }
+  ],
+  "repeat_identical": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "no_train_test_overlap": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "summary": {
+    "n_folds": 7,
+    "n_wins": 0,
+    "win_rate_pct": 0.0,
+    "avg_outperformance_pp": -1.28,
+    "median_outperformance_pp": 0.0,
+    "best_fold_pp": 0.0,
+    "worst_fold_pp": -6.89,
+    "distinct_best_params": [
+      "ma120"
+    ],
+    "n_distinct_params": 1,
+    "param_consistent": true,
+    "verdict": "站不住：多段平均跑輸放著不動，不能說這套規矩有效"
+  },
+  "old_single_split": {
+    "split_date": 20240701,
+    "test_range": [
+      20240701,
+      20261022
+    ],
+    "outperformance_pp": -10.19,
+    "best_param": "ma120",
+    "plain": "舊做法只切一次，等於只考一回；那一回本身就是跑輸的"
+  },
+  "verification": {
+    "checks": {
+      "至少 5 段輪流考": true,
+      "每段訓練與測試不重疊": true,
+      "每段都有放著不動當對照": true,
+      "每段單獨重跑數字相同": true,
+      "結果檔可被讀回": true,
+      "結論由數字自動判定": true
+    },
+    "all_pass": true,
+    "n_checks": 6,
+    "n_fail": 0
+  }
+}

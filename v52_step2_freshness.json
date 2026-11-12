@@ -1,0 +1,189 @@
+{
+  "version": "V5.2-step2",
+  "step": 2,
+  "title": "V2.8 雙時間・三態標籤・資料時效總覽",
+  "generated_at": "2026-11-11",
+  "source_files": [
+    "assets/data/snapshot.json",
+    "assets/data/live.json",
+    "assets/data/daily_picks.json"
+  ],
+  "device_clock_used": false,
+  "stale_threshold_days": 3,
+  "two_times": {
+    "quote_as_of": "2026-10-22",
+    "captured_at": "2026-10-31",
+    "plain": "行情時間＝這筆價格是哪一天的；資料更新時間＝電腦是哪一天去抓的"
+  },
+  "states": [
+    {
+      "key": "intraday",
+      "label": "盤中報價"
+    },
+    {
+      "key": "todayClose",
+      "label": "今日收盤"
+    },
+    {
+      "key": "historical",
+      "label": "歷史資料"
+    }
+  ],
+  "sources": [
+    {
+      "label": "歷史快照（111 檔個股＋大盤）",
+      "quoteAsOf": "2026-10-22",
+      "capturedAt": "2026-10-31",
+      "state": "historical",
+      "basis": "行情日比抓檔日更早，屬歷史資料，不是現在的價格",
+      "lagDays": 9
+    },
+    {
+      "label": "即時報價檔（138 檔）",
+      "quoteAsOf": "2026-11-03",
+      "capturedAt": "2026-11-03T20:56:41",
+      "state": "todayClose",
+      "basis": "行情日與抓檔日同一天（或隔一天補檔），屬當日收盤資料",
+      "lagDays": 0
+    },
+    {
+      "label": "每日掃描名單",
+      "quoteAsOf": "2026-11-03",
+      "capturedAt": "2026-11-03T15:19:06",
+      "state": "todayClose",
+      "basis": "行情日與抓檔日同一天（或隔一天補檔），屬當日收盤資料",
+      "lagDays": 0
+    }
+  ],
+  "data_inconsistency": {
+    "meta_claimed_end": "2026-10-30",
+    "index_actual_last_date": "2026-10-22",
+    "n_stocks_at_claimed_end": 78,
+    "n_stocks_at_index_last_date": 33,
+    "difference_days": 8,
+    "plain": "資料自己貼的標籤寫到 2026-10-30，但大盤實際只到 2026-10-22；111 檔裡 78 檔到標籤那天、33 檔只到大盤那天。所有回測用的是大盤軸，所以實際用到的是 2026-10-22。",
+    "action": "本輪只標記、不改舊結論（一次只做一件）；舊報告寫的範圍是照資料標籤寫的"
+  },
+  "freshness_overview": {
+    "n_stocks": 111,
+    "index_last_date": "2026-10-22",
+    "min_lag_days": 1,
+    "median_lag_days": 1,
+    "max_lag_days": 9,
+    "n_stale": 33,
+    "stale_ratio_pct": 29.7,
+    "buckets": [
+      {
+        "label": "0–1 天",
+        "n": 78
+      },
+      {
+        "label": "2–3 天",
+        "n": 0
+      },
+      {
+        "label": "4–7 天",
+        "n": 0
+      },
+      {
+        "label": "8–14 天",
+        "n": 33
+      },
+      {
+        "label": "15 天以上",
+        "n": 0
+      }
+    ],
+    "worst": [
+      {
+        "id": "2330",
+        "name": "台積電",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2454",
+        "name": "聯發科",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2303",
+        "name": "聯電",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "3711",
+        "name": "日月光投控",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2308",
+        "name": "台達電",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2317",
+        "name": "鴻海",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2357",
+        "name": "華碩",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      },
+      {
+        "id": "2382",
+        "name": "廣達",
+        "last_date": "2026-10-22",
+        "lag_days": 9,
+        "stale": true
+      }
+    ]
+  },
+  "offline_refresh": {
+    "checked_on": "2026-11-11",
+    "captured_at": "2026-10-31",
+    "days_since_capture": 11,
+    "suggest_refetch": true,
+    "where_it_is_used": "只用在離線重抓流程，不進畫面；畫面判斷一律用資料自帶時間"
+  },
+  "outputs": [
+    "web/data_freshness.html",
+    "lib/core/data_freshness_data.dart",
+    "lib/core/data_freshness.dart",
+    "lib/ui/data_freshness_banner.dart"
+  ],
+  "accept": {
+    "two_times_present": true,
+    "three_states_present": true,
+    "no_device_clock": true,
+    "numbers_from_json": true
+  },
+  "verification": {
+    "checks": {
+      "雙時間同時出現在網頁": true,
+      "三態標籤都出現在網頁": true,
+      "網頁沒有裝置時鐘": true,
+      "結果檔可被讀回": true,
+      "驗收欄位全為真": true,
+      "111 檔時效明細完整": true,
+      "資料不一致有被標記出來": true
+    },
+    "all_pass": true,
+    "n_checks": 7,
+    "n_fail": 0
+  }
+}

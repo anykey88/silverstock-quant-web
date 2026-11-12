@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>資料時效總覽・V2.8</title><style>
+:root{--bg:#fbfaf5;--ink:#24303a;--sub:#5b6b78;--line:#e3e0d5;--card:#ffffff;
+--blue:#1f6f8b;--amber:#a8641c;--red:#b03a2e;--green:#2e7d5b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+font-size:21px;line-height:1.85}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:34px;margin:0 0 6px}
+.lead{color:var(--sub);font-size:20px;margin:0 0 26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+padding:22px 24px;margin:0 0 18px}
+.two{display:flex;gap:16px;flex-wrap:wrap}
+.cell{flex:1;min-width:250px;background:#f4f8f9;border-radius:12px;padding:18px}
+.k{font-size:19px;color:var(--sub)}
+.v{font-size:32px;font-weight:700;margin-top:4px}
+.tag{display:inline-block;border-radius:999px;padding:5px 16px;font-size:19px;
+font-weight:700;margin-right:8px}
+.tag.historical{background:#eef2f5;color:var(--blue)}
+.tag.todayClose{background:#eaf5ee;color:var(--green)}
+.tag.intraday{background:#fdf1e3;color:var(--amber)}
+.warn{background:#fdf0ee;border-left:6px solid var(--red);padding:14px 18px;
+border-radius:10px;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:20px}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--sub);font-weight:600}
+.big{font-size:30px;font-weight:700}
+.note{color:var(--sub);font-size:19px}
+.src{font-size:19px;color:var(--sub);margin-top:18px}
+</style></head>
+<body><div class="wrap">
+<h1>這筆資料是舊的還是新的？</h1>
+<p class="lead">這一頁把「資料自己寫的時間」攤開給你看。畫面不顯示現在幾點，避免你以為看到的是即時價格。</p>
+
+<div class="card">
+  <div class="two">
+    <div class="cell"><div class="k">行情時間（這筆價格是哪一天）</div>
+      <div class="v">2026-10-22</div></div>
+    <div class="cell"><div class="k">資料更新時間（哪一天去抓的）</div>
+      <div class="v">2026-10-31</div></div>
+  </div>
+  <p class="note">行情時間＝這筆價格是哪一天的；資料更新時間＝電腦是哪一天去抓的。兩個時間都是靜止的固定值，不會跳動。</p>
+</div>
+
+<div class="card">
+  <h2 style="font-size:26px;margin:0 0 12px">三種狀態標籤</h2>
+  <p><span class="tag intraday">盤中報價</span>交易時間抓到的即時價格　
+     <span class="tag todayClose">今日收盤</span>當天收盤後的價格　
+     <span class="tag historical">歷史資料</span>以前的價格，不是現在</p>
+  <table><thead><tr><th>資料來源</th><th>行情時間</th><th>抓檔時間</th><th>狀態</th><th>落後</th></tr></thead>
+  <tbody><tr><td>歷史快照（111 檔個股＋大盤）</td><td>2026-10-22</td><td>2026-10-31</td><td><span class='tag historical'>歷史資料</span></td><td>9 天</td></tr><tr><td>即時報價檔（138 檔）</td><td>2026-11-03</td><td>2026-11-03T20:56:41</td><td><span class='tag todayClose'>今日收盤</span></td><td>0 天</td></tr><tr><td>每日掃描名單</td><td>2026-11-03</td><td>2026-11-03T15:19:06</td><td><span class='tag todayClose'>今日收盤</span></td><td>0 天</td></tr></tbody></table>
+  <p class="note">判定依據全部來自資料自己帶的欄位，不看手機或電腦現在幾點。</p>
+</div>
+
+<div class="card">
+  <h2 style="font-size:26px;margin:0 0 12px">全部 111 檔的時效總覽</h2>
+  <p>落後超過 3 天的有
+     <span class="big" style="color:var(--red)">33</span> 檔
+     （佔 29.7%）；最多落後
+     <span class="big">9</span> 天，中位數 1 天。</p>
+  <table><thead><tr><th>落後天數</th><th>檔數</th></tr></thead><tbody><tr><td>0–1 天</td><td class='big'>78</td></tr><tr><td>2–3 天</td><td class='big'>0</td></tr><tr><td>4–7 天</td><td class='big'>0</td></tr><tr><td>8–14 天</td><td class='big'>33</td></tr><tr><td>15 天以上</td><td class='big'>0</td></tr></tbody></table>
+  <div class="warn">陳舊提醒：台積電（9 天）、聯發科（9 天）、聯電（9 天）、日月光投控（9 天）、台達電（9 天） 等，價格不是最近一個交易日，別拿去當今天的價錢用。</div>
+</div>
+
+<div class="card">
+  <h2 style="font-size:26px;margin:0 0 12px">還發現一個要講清楚的地方</h2>
+  <div class="warn">資料自己貼的標籤寫到 2026-10-30，但大盤實際只到 2026-10-22；111 檔裡 78 檔到標籤那天、33 檔只到大盤那天。所有回測用的是大盤軸，所以實際用到的是 2026-10-22。</div>
+  <p class="note">本輪只標記、不改舊結論（一次只做一件）；舊報告寫的範圍是照資料標籤寫的。</p>
+</div>
+
+<div class="card">
+  <h2 style="font-size:26px;margin:0 0 12px">什麼時候該重新抓資料？</h2>
+  <p>這件事交給離線流程判斷，不進畫面。本次離線檢查日是 2026-11-11，
+     距離抓檔日 11 天，
+     建議重新抓檔＝<b>是</b>。</p>
+  <p class="note">只用在離線重抓流程，不進畫面；畫面判斷一律用資料自帶時間</p>
+</div>
+
+<p class="src">來源：assets/data/snapshot.json、live.json、daily_picks.json；
+所有數字由程式讀檔回填，不是手抄。2026-11-11 產出・V2.8 規格落地。</p>
+</div></body></html>

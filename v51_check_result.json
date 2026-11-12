@@ -1,0 +1,392 @@
+{
+  "version": "V5.1",
+  "generated_at": "2026-11-09",
+  "purpose": "把前面每次手寫的體檢固化成一支可重跑的程式；只讀、不改檔、不連線、不花錢。",
+  "standard": "沿用 V5.0 體檢口徑，沒有放寬；技術版保留代號故該項不適用。",
+  "check_names": [
+    "簡體字殘留",
+    "長輩版術語洩漏",
+    "標籤被當文字印出",
+    "負號寫法不一致",
+    "章節跳號",
+    "標籤沒閉合",
+    "舊說法殘留／來源讀不到"
+  ],
+  "n_groups": 4,
+  "n_files": 8,
+  "n_checks": 56,
+  "n_fail": 0,
+  "n_not_applicable": 10,
+  "all_pass": true,
+  "results": [
+    {
+      "group": "V4.4",
+      "html": {
+        "file": "V4.4_买在最高点怎么决策.html",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 0
+      },
+      "md": {
+        "file": "V4.4_买在最高点决策卡.md",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "技術版保留代號，不適用"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "這份沒有編號章節（決策卡用別種寫法），不適用"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "純文字，不適用"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 3
+      },
+      "result_file": "v44_top_decision.json",
+      "result_readable": true,
+      "passed": true
+    },
+    {
+      "group": "V4.5",
+      "html": {
+        "file": "V4.5_一张还能怎么办.html",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 0
+      },
+      "md": {
+        "file": "V4.5_一张怎么办决策卡.md",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "技術版保留代號，不適用"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "這份沒有編號章節（決策卡用別種寫法），不適用"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "純文字，不適用"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 3
+      },
+      "result_file": "v45_one_lot.json",
+      "result_readable": true,
+      "passed": true
+    },
+    {
+      "group": "V4.6",
+      "html": {
+        "file": "V4.6_最大资产怎么办.html",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 0
+      },
+      "md": {
+        "file": "V4.6_最大资产决策卡.md",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "技術版保留代號，不適用"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "純文字，不適用"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 2
+      },
+      "result_file": "v46_largest_asset.json",
+      "result_readable": true,
+      "passed": true
+    },
+    {
+      "group": "V5.0",
+      "html": {
+        "file": "V5.0_台海股投资接续系统_开发与技术规格.html",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 0
+      },
+      "md": {
+        "file": "V5.0_系统开发与技术规格.md",
+        "exists": true,
+        "checks": [
+          {
+            "name": "簡體字殘留",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "長輩版術語洩漏",
+            "ok": true,
+            "note": "技術版保留代號，不適用"
+          },
+          {
+            "name": "標籤被當文字印出",
+            "ok": true,
+            "note": "0 處"
+          },
+          {
+            "name": "負號寫法不一致",
+            "ok": true,
+            "note": "乾淨"
+          },
+          {
+            "name": "章節跳號",
+            "ok": true,
+            "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+          },
+          {
+            "name": "標籤沒閉合",
+            "ok": true,
+            "note": "純文字，不適用"
+          },
+          {
+            "name": "舊說法殘留／來源讀不到",
+            "ok": true,
+            "note": "乾淨且來源可讀"
+          }
+        ],
+        "passed": true,
+        "na": 2
+      },
+      "result_file": "v50_inventory.json",
+      "result_readable": true,
+      "passed": true
+    }
+  ],
+  "note": "這支程式本身也是 V5.0 技術債的示範：路徑相對、一次只做一件、做完可重跑對照。"
+}

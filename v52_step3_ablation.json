@@ -1,0 +1,628 @@
+{
+  "version": "V5.2-step3",
+  "step": 3,
+  "title": "三元件消融對照：一次只改一處，各驗一次",
+  "generated_at": "2026-11-11",
+  "source_files": [
+    "assets/data/snapshot.json",
+    "v40_execution_result.json",
+    "tool/v3/execution_lab.py"
+  ],
+  "params": {
+    "symbol": "0050",
+    "step1": 0.2,
+    "step2": 0.4,
+    "reenter_days": 20,
+    "off_w": 0.4,
+    "batch": 0.333333,
+    "note": "參數沿用 V4.0 事前固定的中庸值，沒有重新挑最優"
+  },
+  "n_variants": 8,
+  "n_segments": 3,
+  "segments": [
+    {
+      "label": "多頭一",
+      "range": [
+        20221025,
+        20240711
+      ],
+      "bars": 414,
+      "rows": [
+        {
+          "key": "base",
+          "A": false,
+          "B": false,
+          "C": false,
+          "desc": "都不開（放著不動）",
+          "total_pct": 123.43,
+          "mdd_pct": -8.39,
+          "calmar": 7.56,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "A",
+          "A": true,
+          "B": false,
+          "C": false,
+          "desc": "只開 A：部分減碼",
+          "total_pct": 76.56,
+          "mdd_pct": -6.21,
+          "calmar": 6.7,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "B",
+          "A": false,
+          "B": true,
+          "C": false,
+          "desc": "只開 B：月檢降倉",
+          "total_pct": 123.43,
+          "mdd_pct": -8.39,
+          "calmar": 7.56,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 19,
+          "n_reentry": 0
+        },
+        {
+          "key": "C",
+          "A": false,
+          "B": false,
+          "C": true,
+          "desc": "只開 C：賣後回補",
+          "total_pct": 123.43,
+          "mdd_pct": -8.39,
+          "calmar": 7.56,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "AB",
+          "A": true,
+          "B": true,
+          "C": false,
+          "desc": "A＋B",
+          "total_pct": 125.72,
+          "mdd_pct": -8.39,
+          "calmar": 7.68,
+          "turnovers": 5,
+          "cost_paid_pct": 0.37,
+          "n_scale_out": 1,
+          "n_monthly_check": 19,
+          "n_reentry": 0
+        },
+        {
+          "key": "AC",
+          "A": true,
+          "B": false,
+          "C": true,
+          "desc": "A＋C",
+          "total_pct": 76.56,
+          "mdd_pct": -6.21,
+          "calmar": 6.7,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "BC",
+          "A": false,
+          "B": true,
+          "C": true,
+          "desc": "B＋C",
+          "total_pct": 123.43,
+          "mdd_pct": -8.39,
+          "calmar": 7.56,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 19,
+          "n_reentry": 0
+        },
+        {
+          "key": "ABC",
+          "A": true,
+          "B": true,
+          "C": true,
+          "desc": "全開（＝V4.0 原規則）",
+          "total_pct": 125.72,
+          "mdd_pct": -8.39,
+          "calmar": 7.68,
+          "turnovers": 5,
+          "cost_paid_pct": 0.37,
+          "n_scale_out": 1,
+          "n_monthly_check": 19,
+          "n_reentry": 0
+        }
+      ],
+      "repeat_identical": {
+        "base": true,
+        "A": true,
+        "B": true,
+        "C": true,
+        "AB": true,
+        "AC": true,
+        "BC": true,
+        "ABC": true
+      },
+      "marginal": {
+        "A": {
+          "name": "部分減碼",
+          "plain": "漲到 +20% 賣四分之一、+40% 再賣三分之一，保留底倉",
+          "alone_pp": -46.87,
+          "marginal_pp": 2.29,
+          "interaction_pp": 49.16
+        },
+        "B": {
+          "name": "月檢降倉",
+          "plain": "每 21 天看一次長期均線，轉弱就把目標降到四成，轉強分批補回",
+          "alone_pp": 0.0,
+          "marginal_pp": 49.16,
+          "interaction_pp": 49.16
+        },
+        "C": {
+          "name": "賣後回補",
+          "plain": "賣出後 20 天內再創新高，就買回四分之一",
+          "alone_pp": 0.0,
+          "marginal_pp": 0.0,
+          "interaction_pp": 0.0
+        }
+      },
+      "v40_combo": {
+        "total_pct": 125.72,
+        "mdd_pct": -8.39,
+        "calmar": 7.68,
+        "turnovers": 5,
+        "cost_paid_pct": 0.37
+      },
+      "full_vs_v40_diff": {
+        "total_pct": 0.0,
+        "mdd_pct": 0.0,
+        "calmar": 0.0,
+        "turnovers": 0,
+        "cost_paid_pct": 0.0
+      },
+      "full_matches_v40": true,
+      "buyhold_total_pct": 123.43
+    },
+    {
+      "label": "多頭二",
+      "range": [
+        20250409,
+        20261022
+      ],
+      "bars": 378,
+      "rows": [
+        {
+          "key": "base",
+          "A": false,
+          "B": false,
+          "C": false,
+          "desc": "都不開（放著不動）",
+          "total_pct": 197.68,
+          "mdd_pct": -15.42,
+          "calmar": 6.97,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "A",
+          "A": true,
+          "B": false,
+          "C": false,
+          "desc": "只開 A：部分減碼",
+          "total_pct": 101.9,
+          "mdd_pct": -6.49,
+          "calmar": 9.26,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "B",
+          "A": false,
+          "B": true,
+          "C": false,
+          "desc": "只開 B：月檢降倉",
+          "total_pct": 190.05,
+          "mdd_pct": -15.42,
+          "calmar": 6.74,
+          "turnovers": 3,
+          "cost_paid_pct": 0.27,
+          "n_scale_out": 0,
+          "n_monthly_check": 17,
+          "n_reentry": 0
+        },
+        {
+          "key": "C",
+          "A": false,
+          "B": false,
+          "C": true,
+          "desc": "只開 C：賣後回補",
+          "total_pct": 197.68,
+          "mdd_pct": -15.42,
+          "calmar": 6.97,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "AB",
+          "A": true,
+          "B": true,
+          "C": false,
+          "desc": "A＋B",
+          "total_pct": 182.16,
+          "mdd_pct": -15.42,
+          "calmar": 6.5,
+          "turnovers": 7,
+          "cost_paid_pct": 0.5,
+          "n_scale_out": 1,
+          "n_monthly_check": 17,
+          "n_reentry": 0
+        },
+        {
+          "key": "AC",
+          "A": true,
+          "B": false,
+          "C": true,
+          "desc": "A＋C",
+          "total_pct": 101.9,
+          "mdd_pct": -6.49,
+          "calmar": 9.26,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "BC",
+          "A": false,
+          "B": true,
+          "C": true,
+          "desc": "B＋C",
+          "total_pct": 190.05,
+          "mdd_pct": -15.42,
+          "calmar": 6.74,
+          "turnovers": 3,
+          "cost_paid_pct": 0.27,
+          "n_scale_out": 0,
+          "n_monthly_check": 17,
+          "n_reentry": 0
+        },
+        {
+          "key": "ABC",
+          "A": true,
+          "B": true,
+          "C": true,
+          "desc": "全開（＝V4.0 原規則）",
+          "total_pct": 182.16,
+          "mdd_pct": -15.42,
+          "calmar": 6.5,
+          "turnovers": 7,
+          "cost_paid_pct": 0.5,
+          "n_scale_out": 1,
+          "n_monthly_check": 17,
+          "n_reentry": 0
+        }
+      ],
+      "repeat_identical": {
+        "base": true,
+        "A": true,
+        "B": true,
+        "C": true,
+        "AB": true,
+        "AC": true,
+        "BC": true,
+        "ABC": true
+      },
+      "marginal": {
+        "A": {
+          "name": "部分減碼",
+          "plain": "漲到 +20% 賣四分之一、+40% 再賣三分之一，保留底倉",
+          "alone_pp": -95.78,
+          "marginal_pp": -7.89,
+          "interaction_pp": 87.89
+        },
+        "B": {
+          "name": "月檢降倉",
+          "plain": "每 21 天看一次長期均線，轉弱就把目標降到四成，轉強分批補回",
+          "alone_pp": -7.63,
+          "marginal_pp": 80.26,
+          "interaction_pp": 87.89
+        },
+        "C": {
+          "name": "賣後回補",
+          "plain": "賣出後 20 天內再創新高，就買回四分之一",
+          "alone_pp": 0.0,
+          "marginal_pp": 0.0,
+          "interaction_pp": 0.0
+        }
+      },
+      "v40_combo": {
+        "total_pct": 182.16,
+        "mdd_pct": -15.42,
+        "calmar": 6.5,
+        "turnovers": 7,
+        "cost_paid_pct": 0.5
+      },
+      "full_vs_v40_diff": {
+        "total_pct": 0.0,
+        "mdd_pct": 0.0,
+        "calmar": 0.0,
+        "turnovers": 0,
+        "cost_paid_pct": 0.0
+      },
+      "full_matches_v40": true,
+      "buyhold_total_pct": 197.68
+    },
+    {
+      "label": "全程",
+      "range": [
+        20210601,
+        20261022
+      ],
+      "bars": 1313,
+      "rows": [
+        {
+          "key": "base",
+          "A": false,
+          "B": false,
+          "C": false,
+          "desc": "都不開（放著不動）",
+          "total_pct": 255.98,
+          "mdd_pct": -35.35,
+          "calmar": 0.78,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "A",
+          "A": true,
+          "B": false,
+          "C": false,
+          "desc": "只開 A：部分減碼",
+          "total_pct": 121.0,
+          "mdd_pct": -35.35,
+          "calmar": 0.47,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "B",
+          "A": false,
+          "B": true,
+          "C": false,
+          "desc": "只開 B：月檢降倉",
+          "total_pct": 240.62,
+          "mdd_pct": -22.82,
+          "calmar": 1.16,
+          "turnovers": 19,
+          "cost_paid_pct": 1.19,
+          "n_scale_out": 0,
+          "n_monthly_check": 62,
+          "n_reentry": 0
+        },
+        {
+          "key": "C",
+          "A": false,
+          "B": false,
+          "C": true,
+          "desc": "只開 C：賣後回補",
+          "total_pct": 255.98,
+          "mdd_pct": -35.35,
+          "calmar": 0.78,
+          "turnovers": 1,
+          "cost_paid_pct": 0.14,
+          "n_scale_out": 0,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "AB",
+          "A": true,
+          "B": true,
+          "C": false,
+          "desc": "A＋B",
+          "total_pct": 237.22,
+          "mdd_pct": -22.82,
+          "calmar": 1.15,
+          "turnovers": 23,
+          "cost_paid_pct": 1.42,
+          "n_scale_out": 1,
+          "n_monthly_check": 62,
+          "n_reentry": 0
+        },
+        {
+          "key": "AC",
+          "A": true,
+          "B": false,
+          "C": true,
+          "desc": "A＋C",
+          "total_pct": 121.0,
+          "mdd_pct": -35.35,
+          "calmar": 0.47,
+          "turnovers": 3,
+          "cost_paid_pct": 0.28,
+          "n_scale_out": 1,
+          "n_monthly_check": 0,
+          "n_reentry": 0
+        },
+        {
+          "key": "BC",
+          "A": false,
+          "B": true,
+          "C": true,
+          "desc": "B＋C",
+          "total_pct": 240.62,
+          "mdd_pct": -22.82,
+          "calmar": 1.16,
+          "turnovers": 19,
+          "cost_paid_pct": 1.19,
+          "n_scale_out": 0,
+          "n_monthly_check": 62,
+          "n_reentry": 0
+        },
+        {
+          "key": "ABC",
+          "A": true,
+          "B": true,
+          "C": true,
+          "desc": "全開（＝V4.0 原規則）",
+          "total_pct": 237.22,
+          "mdd_pct": -22.82,
+          "calmar": 1.15,
+          "turnovers": 23,
+          "cost_paid_pct": 1.42,
+          "n_scale_out": 1,
+          "n_monthly_check": 62,
+          "n_reentry": 0
+        }
+      ],
+      "repeat_identical": {
+        "base": true,
+        "A": true,
+        "B": true,
+        "C": true,
+        "AB": true,
+        "AC": true,
+        "BC": true,
+        "ABC": true
+      },
+      "marginal": {
+        "A": {
+          "name": "部分減碼",
+          "plain": "漲到 +20% 賣四分之一、+40% 再賣三分之一，保留底倉",
+          "alone_pp": -134.98,
+          "marginal_pp": -3.4,
+          "interaction_pp": 131.58
+        },
+        "B": {
+          "name": "月檢降倉",
+          "plain": "每 21 天看一次長期均線，轉弱就把目標降到四成，轉強分批補回",
+          "alone_pp": -15.36,
+          "marginal_pp": 116.22,
+          "interaction_pp": 131.58
+        },
+        "C": {
+          "name": "賣後回補",
+          "plain": "賣出後 20 天內再創新高，就買回四分之一",
+          "alone_pp": 0.0,
+          "marginal_pp": 0.0,
+          "interaction_pp": 0.0
+        }
+      },
+      "v40_combo": {
+        "total_pct": 237.22,
+        "mdd_pct": -22.82,
+        "calmar": 1.15,
+        "turnovers": 23,
+        "cost_paid_pct": 1.42
+      },
+      "full_vs_v40_diff": {
+        "total_pct": 0.0,
+        "mdd_pct": 0.0,
+        "calmar": 0.0,
+        "turnovers": 0,
+        "cost_paid_pct": 0.0
+      },
+      "full_matches_v40": true,
+      "buyhold_total_pct": 255.98
+    }
+  ],
+  "cross_segment": {
+    "A": {
+      "name": "部分減碼",
+      "alone_by_segment_pp": [
+        -46.87,
+        -95.78,
+        -134.98
+      ],
+      "marginal_by_segment_pp": [
+        2.29,
+        -7.89,
+        -3.4
+      ],
+      "avg_alone_pp": -92.54,
+      "avg_marginal_pp": -3.0,
+      "avg_interaction_pp": 89.54
+    },
+    "B": {
+      "name": "月檢降倉",
+      "alone_by_segment_pp": [
+        0.0,
+        -7.63,
+        -15.36
+      ],
+      "marginal_by_segment_pp": [
+        49.16,
+        80.26,
+        116.22
+      ],
+      "avg_alone_pp": -7.66,
+      "avg_marginal_pp": 81.88,
+      "avg_interaction_pp": 89.54
+    },
+    "C": {
+      "name": "賣後回補",
+      "alone_by_segment_pp": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "marginal_by_segment_pp": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "avg_alone_pp": 0.0,
+      "avg_marginal_pp": 0.0,
+      "avg_interaction_pp": 0.0
+    }
+  },
+  "finding": {
+    "n_reentry_total": 0,
+    "abc_vs_ab_turnovers_same": true,
+    "plain": "拆開才看得出來：V4.0 當成最關鍵升級的「賣後回補」在三段實測中一次都沒發動，功勞其實來自「部分減碼」與「月檢降倉」的交互；單獨看其中一個還會以為它有害。"
+  },
+  "verification": {
+    "checks": {
+      "8 種組合都跑完": true,
+      "每組單獨重跑數字完全相同": true,
+      "全開組與 V4.0 原程式對得上": true,
+      "三段都有對照結果": true,
+      "結果檔可被讀回": true
+    },
+    "all_pass": true,
+    "n_checks": 5,
+    "n_fail": 0
+  }
+}

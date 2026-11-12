@@ -1,0 +1,153 @@
+{
+  "version": "V6.0",
+  "generated_at": "2026-11-12",
+  "purpose": "沿用 V5.1 auto_check.py 的七項口徑檢查新報告，標準沒放寬。",
+  "standard": "技術版保留代號與 URL，故術語檢查與標籤閉合該項不適用。",
+  "check_names": [
+    "簡體字殘留",
+    "長輩版術語洩漏",
+    "標籤被當文字印出",
+    "負號寫法不一致",
+    "章節跳號",
+    "標籤沒閉合",
+    "舊說法殘留／來源讀不到"
+  ],
+  "result_file": "v60_income_research.json",
+  "result_readable": true,
+  "n_files": 3,
+  "n_checks": 21,
+  "n_fail": 0,
+  "n_not_applicable": 3,
+  "all_pass": true,
+  "results": [
+    {
+      "file": "V6.0_創收方法與出路.html",
+      "exists": true,
+      "checks": [
+        {
+          "name": "簡體字殘留",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "長輩版術語洩漏",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "標籤被當文字印出",
+          "ok": true,
+          "note": "0 處"
+        },
+        {
+          "name": "負號寫法不一致",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "章節跳號",
+          "ok": true,
+          "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+        },
+        {
+          "name": "標籤沒閉合",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "舊說法殘留／來源讀不到",
+          "ok": true,
+          "note": "乾淨且來源可讀"
+        }
+      ],
+      "passed": true,
+      "na": 0
+    },
+    {
+      "file": "V6.0_創收方法與出路決策卡.md",
+      "exists": true,
+      "checks": [
+        {
+          "name": "簡體字殘留",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "長輩版術語洩漏",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "標籤被當文字印出",
+          "ok": true,
+          "note": "0 處"
+        },
+        {
+          "name": "負號寫法不一致",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "章節跳號",
+          "ok": true,
+          "note": "抓到 [1, 2, 3, 4, 5, 6]／應為 [1, 2, 3, 4, 5, 6]"
+        },
+        {
+          "name": "標籤沒閉合",
+          "ok": true,
+          "note": "純文字，不適用"
+        },
+        {
+          "name": "舊說法殘留／來源讀不到",
+          "ok": true,
+          "note": "乾淨且來源可讀"
+        }
+      ],
+      "passed": true,
+      "na": 1
+    },
+    {
+      "file": "V6.0_INCOME_PATHS.md",
+      "exists": true,
+      "checks": [
+        {
+          "name": "簡體字殘留",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "長輩版術語洩漏",
+          "ok": true,
+          "note": "技術版保留代號，不適用"
+        },
+        {
+          "name": "標籤被當文字印出",
+          "ok": true,
+          "note": "0 處"
+        },
+        {
+          "name": "負號寫法不一致",
+          "ok": true,
+          "note": "乾淨"
+        },
+        {
+          "name": "章節跳號",
+          "ok": true,
+          "note": "抓到 [1, 2, 3, 4, 5, 6]／應為 [1, 2, 3, 4, 5, 6]"
+        },
+        {
+          "name": "標籤沒閉合",
+          "ok": true,
+          "note": "純文字，不適用"
+        },
+        {
+          "name": "舊說法殘留／來源讀不到",
+          "ok": true,
+          "note": "乾淨且來源可讀"
+        }
+      ],
+      "passed": true,
+      "na": 2
+    }
+  ]
+}

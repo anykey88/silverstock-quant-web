@@ -1,0 +1,1485 @@
+{
+ "meta": {
+  "title": "V4.1 個股印證與市場結構",
+  "universe": 111,
+  "range": [
+   "2021-06-01",
+   "2026-10-30"
+  ],
+  "bars": 1313,
+  "note": "含息總報酬；量比為成交量代理，非真實換手率；結構為事後橫截面分解"
+ },
+ "periods": [
+  {
+   "dir": "空頭",
+   "start": 20210601,
+   "end": 20220706,
+   "label": "2021/06–2022/07 慢熊"
+  },
+  {
+   "dir": "空頭",
+   "start": 20220706,
+   "end": 20221025,
+   "label": "2022/07–2022/10 空頭"
+  },
+  {
+   "dir": "多頭",
+   "start": 20221025,
+   "end": 20240711,
+   "label": "2022/10–2024/07 多頭一"
+  },
+  {
+   "dir": "空頭",
+   "start": 20240711,
+   "end": 20250221,
+   "label": "2024/07–2025/02 震盪"
+  },
+  {
+   "dir": "空頭",
+   "start": 20250221,
+   "end": 20250409,
+   "label": "2025/02–2025/04 急殺"
+  },
+  {
+   "dir": "多頭",
+   "start": 20250409,
+   "end": 20261022,
+   "label": "2025/04–2026/10 多頭二"
+  }
+ ],
+ "cases": [
+  {
+   "sid": "0050",
+   "name": "元大台灣50",
+   "industry": "ETF",
+   "close": 106.9,
+   "passed_v37": false,
+   "v37_note": "ETF 不適用個股漏斗，直接歸核心層",
+   "score_v37": null,
+   "fail_reasons": [
+    "估值不合格"
+   ],
+   "group_v39": "DEF",
+   "adv_yi": 120.46,
+   "pe": null,
+   "yield_pct": null,
+   "vol_pct": 28.7,
+   "mdd_price_pct": -36.4,
+   "ret5y_price_pct": 207.9,
+   "avg_rvol_60": 1.07,
+   "rvol_gt2_pct": 6.7,
+   "total_return_5y_pct": 256.49,
+   "mdd_total_pct": -35.35,
+   "ann_vol_pct": 23.02,
+   "layer": "L2 指數核心",
+   "layer_reason": "市場基準，永不擇時",
+   "bands": {
+    "2021/06–2022/07 慢熊": -17.71,
+    "2022/07–2022/10 空頭": -11.16,
+    "2022/10–2024/07 多頭一": 123.75,
+    "2024/07–2025/02 震盪": -1.01,
+    "2025/02–2025/04 急殺": -26.14,
+    "2025/04–2026/10 多頭二": 198.11
+   },
+   "oos_20220706_pct": 333.22,
+   "crash_30d_pct": -26.14
+  },
+  {
+   "sid": "0056",
+   "name": "元大高股息",
+   "industry": "ETF",
+   "close": 56.3,
+   "passed_v37": false,
+   "v37_note": "ETF 不適用個股漏斗，直接歸核心層",
+   "score_v37": null,
+   "fail_reasons": [
+    "估值不合格"
+   ],
+   "group_v39": "DEF",
+   "adv_yi": 23.69,
+   "pe": null,
+   "yield_pct": null,
+   "vol_pct": 23.0,
+   "mdd_price_pct": -35.1,
+   "ret5y_price_pct": 60.6,
+   "avg_rvol_60": 1.08,
+   "rvol_gt2_pct": 11.7,
+   "total_return_5y_pct": 156.35,
+   "mdd_total_pct": -26.69,
+   "ann_vol_pct": 19.21,
+   "layer": "L1 高股息",
+   "layer_reason": "現金流安全墊",
+   "bands": {
+    "2021/06–2022/07 慢熊": -20.74,
+    "2022/07–2022/10 空頭": -3.82,
+    "2022/10–2024/07 多頭一": 106.87,
+    "2024/07–2025/02 震盪": -8.24,
+    "2025/02–2025/04 急殺": -20.11,
+    "2025/04–2026/10 多頭二": 121.74
+   },
+   "oos_20220706_pct": 223.43,
+   "crash_30d_pct": -20.11
+  },
+  {
+   "sid": "00878",
+   "name": "國泰永續高股息",
+   "industry": "ETF",
+   "close": 35.27,
+   "passed_v37": false,
+   "v37_note": "ETF 不適用個股漏斗，直接歸核心層",
+   "score_v37": null,
+   "fail_reasons": [
+    "估值不合格"
+   ],
+   "group_v39": "DEF",
+   "adv_yi": 13.97,
+   "pe": null,
+   "yield_pct": null,
+   "vol_pct": 18.2,
+   "mdd_price_pct": -27.6,
+   "ret5y_price_pct": 91.0,
+   "avg_rvol_60": 1.02,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 186.66,
+   "mdd_total_pct": -22.47,
+   "ann_vol_pct": 16.79,
+   "layer": "L1 高股息",
+   "layer_reason": "現金流安全墊",
+   "bands": {
+    "2021/06–2022/07 慢熊": -7.33,
+    "2022/07–2022/10 空頭": -2.27,
+    "2022/10–2024/07 多頭一": 80.03,
+    "2024/07–2025/02 震盪": -1.27,
+    "2025/02–2025/04 急殺": -21.38,
+    "2025/04–2026/10 多頭二": 126.49
+   },
+   "oos_20220706_pct": 209.34,
+   "crash_30d_pct": -21.38
+  },
+  {
+   "sid": "2330",
+   "name": "台積電",
+   "industry": "半導體",
+   "close": 2385.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 56.4,
+   "fail_reasons": [],
+   "group_v39": "MID",
+   "adv_yi": 638.37,
+   "pe": 29.1,
+   "yield_pct": 0.88,
+   "vol_pct": 29.5,
+   "mdd_price_pct": -45.7,
+   "ret5y_price_pct": 298.8,
+   "avg_rvol_60": 0.99,
+   "rvol_gt2_pct": 3.3,
+   "total_return_5y_pct": 337.79,
+   "mdd_total_pct": -44.85,
+   "ann_vol_pct": 30.19,
+   "layer": "L3 衛星 ≤5%",
+   "layer_reason": "MDD -45.7%／波動 29.5% 過高，不進核心層",
+   "bands": {
+    "2021/06–2022/07 慢熊": -25.81,
+    "2022/07–2022/10 空頭": -14.33,
+    "2022/10–2024/07 多頭一": 201.64,
+    "2024/07–2025/02 震盪": 2.21,
+    "2025/02–2025/04 急殺": -27.99,
+    "2025/04–2026/10 多頭二": 210.27
+   },
+   "oos_20220706_pct": 490.08,
+   "crash_30d_pct": -27.99
+  },
+  {
+   "sid": "2317",
+   "name": "鴻海",
+   "industry": "電子零組件",
+   "close": 245.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 66.3,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 105.14,
+   "pe": 16.7,
+   "yield_pct": 2.82,
+   "vol_pct": 31.8,
+   "mdd_price_pct": -50.3,
+   "ret5y_price_pct": 114.0,
+   "avg_rvol_60": 1.0,
+   "rvol_gt2_pct": 1.7,
+   "total_return_5y_pct": 165.48,
+   "mdd_total_pct": -50.33,
+   "ann_vol_pct": 31.8,
+   "layer": "L3 衛星 ≤5%",
+   "layer_reason": "MDD -50.3%／波動 31.8% 過高，不進核心層",
+   "bands": {
+    "2021/06–2022/07 慢熊": -4.63,
+    "2022/07–2022/10 空頭": 2.99,
+    "2022/10–2024/07 多頭一": 133.61,
+    "2024/07–2025/02 震盪": -18.85,
+    "2025/02–2025/04 急殺": -38.52,
+    "2025/04–2026/10 多頭二": 131.93
+   },
+   "oos_20220706_pct": 178.38,
+   "crash_30d_pct": -38.52
+  },
+  {
+   "sid": "2412",
+   "name": "中華電",
+   "industry": "電信",
+   "close": 158.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 79.6,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 16.54,
+   "pe": 28.6,
+   "yield_pct": 3.57,
+   "vol_pct": 11.7,
+   "mdd_price_pct": -18.9,
+   "ret5y_price_pct": 39.2,
+   "avg_rvol_60": 0.94,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 73.25,
+   "mdd_total_pct": -18.01,
+   "ann_vol_pct": 12.83,
+   "layer": "L1 高股息",
+   "layer_reason": "殖利率 3.57% 且通過漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": 21.25,
+    "2022/07–2022/10 空頭": -13.67,
+    "2022/10–2024/07 多頭一": 15.46,
+    "2024/07–2025/02 震盪": 7.17,
+    "2025/02–2025/04 急殺": -0.79,
+    "2025/04–2026/10 多頭二": 34.82
+   },
+   "oos_20220706_pct": 42.89,
+   "crash_30d_pct": -0.79
+  },
+  {
+   "sid": "3045",
+   "name": "台灣大",
+   "industry": "電信",
+   "close": 133.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 83.3,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 11.3,
+   "pe": 23.1,
+   "yield_pct": 3.89,
+   "vol_pct": 17.4,
+   "mdd_price_pct": -17.6,
+   "ret5y_price_pct": 33.0,
+   "avg_rvol_60": 0.9,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 68.47,
+   "mdd_total_pct": -16.89,
+   "ann_vol_pct": 16.04,
+   "layer": "L1 高股息",
+   "layer_reason": "殖利率 3.89% 且通過漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": 17.94,
+    "2022/07–2022/10 空頭": -13.21,
+    "2022/10–2024/07 多頭一": 15.61,
+    "2024/07–2025/02 震盪": 12.38,
+    "2025/02–2025/04 急殺": 1.32,
+    "2025/04–2026/10 多頭二": 25.03
+   },
+   "oos_20220706_pct": 42.84,
+   "crash_30d_pct": 1.32
+  },
+  {
+   "sid": "4904",
+   "name": "遠傳",
+   "industry": "電信",
+   "close": 115.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 77.5,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 6.65,
+   "pe": 25.6,
+   "yield_pct": 3.63,
+   "vol_pct": 18.9,
+   "mdd_price_pct": -25.6,
+   "ret5y_price_pct": 78.0,
+   "avg_rvol_60": 0.89,
+   "rvol_gt2_pct": 3.3,
+   "total_return_5y_pct": 126.25,
+   "mdd_total_pct": -25.57,
+   "ann_vol_pct": 19.57,
+   "layer": "L1 高股息",
+   "layer_reason": "殖利率 3.63% 且通過漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": 46.32,
+    "2022/07–2022/10 空頭": -19.15,
+    "2022/10–2024/07 多頭一": 23.09,
+    "2024/07–2025/02 震盪": 12.41,
+    "2025/02–2025/04 急殺": -3.57,
+    "2025/04–2026/10 多頭二": 43.33
+   },
+   "oos_20220706_pct": 54.62,
+   "crash_30d_pct": -3.57
+  },
+  {
+   "sid": "1102",
+   "name": "亞泥",
+   "industry": "水泥",
+   "close": 38.55,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 88.2,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 3.22,
+   "pe": 9.8,
+   "yield_pct": 6.45,
+   "vol_pct": 18.3,
+   "mdd_price_pct": -40.3,
+   "ret5y_price_pct": -25.3,
+   "avg_rvol_60": 0.89,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 5.86,
+   "mdd_total_pct": -28.7,
+   "ann_vol_pct": 20.48,
+   "layer": "L3 衛星 ≤5%",
+   "layer_reason": "MDD -40.3%／波動 18.3% 過高，不進核心層",
+   "bands": {
+    "2021/06–2022/07 慢熊": -1.81,
+    "2022/07–2022/10 空頭": -15.76,
+    "2022/10–2024/07 多頭一": 33.58,
+    "2024/07–2025/02 震盪": -6.77,
+    "2025/02–2025/04 急殺": 3.1,
+    "2025/04–2026/10 多頭二": -0.32
+   },
+   "oos_20220706_pct": 7.81,
+   "crash_30d_pct": 3.1
+  },
+  {
+   "sid": "2891",
+   "name": "中信金",
+   "industry": "金融",
+   "close": 74.9,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 76.9,
+   "fail_reasons": [],
+   "group_v39": "MID",
+   "adv_yi": 23.54,
+   "pe": 16.2,
+   "yield_pct": 3.68,
+   "vol_pct": 25.3,
+   "mdd_price_pct": -36.0,
+   "ret5y_price_pct": 225.7,
+   "avg_rvol_60": 0.96,
+   "rvol_gt2_pct": 3.3,
+   "total_return_5y_pct": 323.71,
+   "mdd_total_pct": -32.74,
+   "ann_vol_pct": 24.07,
+   "layer": "L1 高股息",
+   "layer_reason": "殖利率 3.68% 且通過漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": 12.25,
+    "2022/07–2022/10 空頭": -14.89,
+    "2022/10–2024/07 多頭一": 118.76,
+    "2024/07–2025/02 震盪": 0.12,
+    "2025/02–2025/04 急殺": -15.63,
+    "2025/04–2026/10 多頭二": 140.02
+   },
+   "oos_20220706_pct": 277.48,
+   "crash_30d_pct": -15.63
+  },
+  {
+   "sid": "2890",
+   "name": "永豐金",
+   "industry": "金融",
+   "close": 46.5,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 78.1,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 10.77,
+   "pe": 16.5,
+   "yield_pct": 2.98,
+   "vol_pct": 23.1,
+   "mdd_price_pct": -29.9,
+   "ret5y_price_pct": 243.2,
+   "avg_rvol_60": 0.92,
+   "rvol_gt2_pct": 3.3,
+   "total_return_5y_pct": 324.75,
+   "mdd_total_pct": -29.26,
+   "ann_vol_pct": 22.68,
+   "layer": "L2／L3 邊界",
+   "layer_reason": "通過漏斗但殖利率偏低，單檔不超過 5%",
+   "bands": {
+    "2021/06–2022/07 慢熊": 27.39,
+    "2022/07–2022/10 空頭": -0.01,
+    "2022/10–2024/07 多頭一": 74.51,
+    "2024/07–2025/02 震盪": -10.94,
+    "2025/02–2025/04 急殺": -16.96,
+    "2025/04–2026/10 多頭二": 158.38
+   },
+   "oos_20220706_pct": 233.43,
+   "crash_30d_pct": -16.96
+  },
+  {
+   "sid": "2382",
+   "name": "廣達",
+   "industry": "電子零組件",
+   "close": 322.0,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 71.5,
+   "fail_reasons": [],
+   "group_v39": "DEF",
+   "adv_yi": 54.41,
+   "pe": 14.6,
+   "yield_pct": 4.67,
+   "vol_pct": 35.7,
+   "mdd_price_pct": -47.7,
+   "ret5y_price_pct": 258.2,
+   "avg_rvol_60": 0.9,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 394.25,
+   "mdd_total_pct": -47.65,
+   "ann_vol_pct": 39.47,
+   "layer": "L3 衛星 ≤5%",
+   "layer_reason": "MDD -47.7%／波動 35.7% 過高，不進核心層",
+   "bands": {
+    "2021/06–2022/07 慢熊": -11.66,
+    "2022/07–2022/10 空頭": -0.54,
+    "2022/10–2024/07 多頭一": 431.96,
+    "2024/07–2025/02 震盪": -18.8,
+    "2025/02–2025/04 急殺": -33.89,
+    "2025/04–2026/10 多頭二": 96.97
+   },
+   "oos_20220706_pct": 459.46,
+   "crash_30d_pct": -33.89
+  },
+  {
+   "sid": "2357",
+   "name": "華碩",
+   "industry": "電子零組件",
+   "close": 946.0,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "波动过高"
+   ],
+   "group_v39": "DEF",
+   "adv_yi": 32.44,
+   "pe": 14.1,
+   "yield_pct": 4.35,
+   "vol_pct": 47.8,
+   "mdd_price_pct": -44.2,
+   "ret5y_price_pct": 134.7,
+   "avg_rvol_60": 0.92,
+   "rvol_gt2_pct": 3.3,
+   "total_return_5y_pct": 250.64,
+   "mdd_total_pct": -37.8,
+   "ann_vol_pct": 35.6,
+   "layer": "排除",
+   "layer_reason": "未通過 V3.7 五層漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": -9.19,
+    "2022/07–2022/10 空頭": -22.32,
+    "2022/10–2024/07 多頭一": 140.2,
+    "2024/07–2025/02 震盪": 38.21,
+    "2025/02–2025/04 急殺": -37.8,
+    "2025/04–2026/10 多頭二": 140.7
+   },
+   "oos_20220706_pct": 286.11,
+   "crash_30d_pct": -37.8
+  },
+  {
+   "sid": "2618",
+   "name": "長榮航",
+   "industry": "航運",
+   "close": 42.7,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": 83.2,
+   "fail_reasons": [],
+   "group_v39": "HYPE",
+   "adv_yi": 9.11,
+   "pe": 8.9,
+   "yield_pct": 4.74,
+   "vol_pct": 25.0,
+   "mdd_price_pct": -38.7,
+   "ret5y_price_pct": 137.2,
+   "avg_rvol_60": 0.81,
+   "rvol_gt2_pct": 1.7,
+   "total_return_5y_pct": 182.28,
+   "mdd_total_pct": -37.59,
+   "ann_vol_pct": 38.09,
+   "layer": "排除／僅 L3 ≤1%",
+   "layer_reason": "炒作組：−15% 無條件砍、不攤平",
+   "bands": {
+    "2021/06–2022/07 慢熊": 75.56,
+    "2022/07–2022/10 空頭": -25.59,
+    "2022/10–2024/07 多頭一": 62.17,
+    "2024/07–2025/02 震盪": 22.22,
+    "2025/02–2025/04 急殺": -21.91,
+    "2025/04–2026/10 多頭二": 39.6
+   },
+   "oos_20220706_pct": 60.79,
+   "crash_30d_pct": -21.91
+  },
+  {
+   "sid": "1605",
+   "name": "華新",
+   "industry": "鋼鐵",
+   "close": 35.95,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "回撤过深"
+   ],
+   "group_v39": "HYPE",
+   "adv_yi": 9.81,
+   "pe": 11.7,
+   "yield_pct": 1.3,
+   "vol_pct": 40.5,
+   "mdd_price_pct": -69.6,
+   "ret5y_price_pct": 35.7,
+   "avg_rvol_60": 1.09,
+   "rvol_gt2_pct": 15.0,
+   "total_return_5y_pct": 65.32,
+   "mdd_total_pct": -67.48,
+   "ann_vol_pct": 44.75,
+   "layer": "排除／僅 L3 ≤1%",
+   "layer_reason": "炒作組：−15% 無條件砍、不攤平",
+   "bands": {
+    "2021/06–2022/07 慢熊": 33.2,
+    "2022/07–2022/10 空頭": 6.8,
+    "2022/10–2024/07 多頭一": 7.38,
+    "2024/07–2025/02 震盪": -18.76,
+    "2025/02–2025/04 急殺": -38.19,
+    "2025/04–2026/10 多頭二": 115.54
+   },
+   "oos_20220706_pct": 24.11,
+   "crash_30d_pct": -38.19
+  },
+  {
+   "sid": "8908",
+   "name": "欣雄",
+   "industry": "天然氣",
+   "close": 39.6,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "流动性不足",
+    "回撤过深",
+    "跌破年线"
+   ],
+   "group_v39": "HYPE",
+   "adv_yi": 0.01,
+   "pe": 19.1,
+   "yield_pct": 4.49,
+   "vol_pct": 12.5,
+   "mdd_price_pct": -55.9,
+   "ret5y_price_pct": -25.3,
+   "avg_rvol_60": 1.02,
+   "rvol_gt2_pct": 6.7,
+   "total_return_5y_pct": -16.91,
+   "mdd_total_pct": -52.79,
+   "ann_vol_pct": 19.76,
+   "layer": "排除／僅 L3 ≤1%",
+   "layer_reason": "炒作組：−15% 無條件砍、不攤平",
+   "bands": {
+    "2021/06–2022/07 慢熊": 52.43,
+    "2022/07–2022/10 空頭": -21.02,
+    "2022/10–2024/07 多頭一": -13.13,
+    "2024/07–2025/02 震盪": -10.87,
+    "2025/02–2025/04 急殺": -14.85,
+    "2025/04–2026/10 多頭二": 4.69
+   },
+   "oos_20220706_pct": -45.49,
+   "crash_30d_pct": -14.85
+  },
+  {
+   "sid": "2227",
+   "name": "裕日車",
+   "industry": "汽車",
+   "close": 42.1,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "流动性不足",
+    "回撤过深",
+    "估值不合格",
+    "跌破年线"
+   ],
+   "group_v39": "HYPE",
+   "adv_yi": 0.02,
+   "pe": 0.0,
+   "yield_pct": 1.87,
+   "vol_pct": 13.4,
+   "mdd_price_pct": -84.9,
+   "ret5y_price_pct": -84.2,
+   "avg_rvol_60": 1.05,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": -79.69,
+   "mdd_total_pct": -81.77,
+   "ann_vol_pct": 27.4,
+   "layer": "排除／僅 L3 ≤1%",
+   "layer_reason": "炒作組：−15% 無條件砍、不攤平",
+   "bands": {
+    "2021/06–2022/07 慢熊": -8.13,
+    "2022/07–2022/10 空頭": -17.36,
+    "2022/10–2024/07 多頭一": -24.45,
+    "2024/07–2025/02 震盪": -41.62,
+    "2025/02–2025/04 急殺": -31.44,
+    "2025/04–2026/10 多頭二": -11.52
+   },
+   "oos_20220706_pct": -77.89,
+   "crash_30d_pct": -31.44
+  },
+  {
+   "sid": "1795",
+   "name": "美時",
+   "industry": "生技醫療",
+   "close": 167.5,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "流动性不足",
+    "跌破年线"
+   ],
+   "group_v39": "HYPE",
+   "adv_yi": 1.74,
+   "pe": 12.5,
+   "yield_pct": 1.53,
+   "vol_pct": 25.7,
+   "mdd_price_pct": -53.9,
+   "ret5y_price_pct": 81.5,
+   "avg_rvol_60": 0.88,
+   "rvol_gt2_pct": 6.7,
+   "total_return_5y_pct": 103.59,
+   "mdd_total_pct": -52.34,
+   "ann_vol_pct": 47.4,
+   "layer": "排除／僅 L3 ≤1%",
+   "layer_reason": "炒作組：−15% 無條件砍、不攤平",
+   "bands": {
+    "2021/06–2022/07 慢熊": 55.99,
+    "2022/07–2022/10 空頭": 1.05,
+    "2022/10–2024/07 多頭一": 99.48,
+    "2024/07–2025/02 震盪": -0.83,
+    "2025/02–2025/04 急殺": -36.0,
+    "2025/04–2026/10 多頭二": 2.01
+   },
+   "oos_20220706_pct": 30.52,
+   "crash_30d_pct": -36.0
+  },
+  {
+   "sid": "2454",
+   "name": "聯發科",
+   "industry": "半導體",
+   "close": 4010.0,
+   "passed_v37": false,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "波动过高",
+    "估值不合格"
+   ],
+   "group_v39": "MID",
+   "adv_yi": 378.76,
+   "pe": 82.2,
+   "yield_pct": 1.07,
+   "vol_pct": 59.3,
+   "mdd_price_pct": -54.4,
+   "ret5y_price_pct": 310.4,
+   "avg_rvol_60": 1.0,
+   "rvol_gt2_pct": 5.0,
+   "total_return_5y_pct": 467.63,
+   "mdd_total_pct": -50.69,
+   "ann_vol_pct": 44.12,
+   "layer": "排除",
+   "layer_reason": "未通過 V3.7 五層漏斗",
+   "bands": {
+    "2021/06–2022/07 慢熊": -30.49,
+    "2022/07–2022/10 空頭": -6.94,
+    "2022/10–2024/07 多頭一": 190.94,
+    "2024/07–2025/02 震盪": 8.62,
+    "2025/02–2025/04 急殺": -21.52,
+    "2025/04–2026/10 多頭二": 253.83
+   },
+   "oos_20220706_pct": 716.59,
+   "crash_30d_pct": -21.52
+  },
+  {
+   "sid": "2884",
+   "name": "玉山金",
+   "industry": "金融",
+   "close": 49.75,
+   "passed_v37": true,
+   "v37_note": "",
+   "score_v37": null,
+   "fail_reasons": [
+    "产业超限(金融已6档)"
+   ],
+   "group_v39": "MID",
+   "adv_yi": 17.14,
+   "pe": 18.8,
+   "yield_pct": 3.09,
+   "vol_pct": 27.0,
+   "mdd_price_pct": -36.4,
+   "ret5y_price_pct": 92.1,
+   "avg_rvol_60": 0.95,
+   "rvol_gt2_pct": 6.7,
+   "total_return_5y_pct": 127.82,
+   "mdd_total_pct": -34.89,
+   "ann_vol_pct": 19.57,
+   "layer": "L2／L3 邊界",
+   "layer_reason": "通過漏斗但殖利率偏低，單檔不超過 5%",
+   "bands": {
+    "2021/06–2022/07 慢熊": 15.53,
+    "2022/07–2022/10 空頭": -20.28,
+    "2022/10–2024/07 多頭一": 37.37,
+    "2024/07–2025/02 震盪": -0.67,
+    "2025/02–2025/04 急殺": -12.65,
+    "2025/04–2026/10 多頭二": 107.53
+   },
+   "oos_20220706_pct": 97.2,
+   "crash_30d_pct": -12.65
+  }
+ ],
+ "v37_pass_list": [
+  {
+   "sid": "1102",
+   "name": "亞泥",
+   "industry": "水泥",
+   "score": 88.2,
+   "yield_pct": 6.45,
+   "pe": 9.8,
+   "mdd_pct": -40.3
+  },
+  {
+   "sid": "2834",
+   "name": "台企銀",
+   "industry": "金融",
+   "score": 86.1,
+   "yield_pct": 5.71,
+   "pe": 12.9,
+   "mdd_pct": -32.6
+  },
+  {
+   "sid": "1216",
+   "name": "統一",
+   "industry": "食品",
+   "score": 84.0,
+   "yield_pct": 4.06,
+   "pe": 17.9,
+   "mdd_pct": -23.8
+  },
+  {
+   "sid": "3045",
+   "name": "台灣大",
+   "industry": "電信",
+   "score": 83.3,
+   "yield_pct": 3.89,
+   "pe": 23.1,
+   "mdd_pct": -17.6
+  },
+  {
+   "sid": "2801",
+   "name": "彰銀",
+   "industry": "金融",
+   "score": 83.3,
+   "yield_pct": 3.81,
+   "pe": 16.2,
+   "mdd_pct": -17.5
+  },
+  {
+   "sid": "2618",
+   "name": "長榮航",
+   "industry": "航運",
+   "score": 83.2,
+   "yield_pct": 4.74,
+   "pe": 8.9,
+   "mdd_pct": -38.7
+  },
+  {
+   "sid": "2912",
+   "name": "統一超",
+   "industry": "食品",
+   "score": 81.6,
+   "yield_pct": 4.24,
+   "pe": 19.1,
+   "mdd_pct": -31.8
+  },
+  {
+   "sid": "2892",
+   "name": "第一金",
+   "industry": "金融",
+   "score": 80.2,
+   "yield_pct": 3.36,
+   "pe": 18.1,
+   "mdd_pct": -20.2
+  },
+  {
+   "sid": "5880",
+   "name": "合庫金",
+   "industry": "金融",
+   "score": 80.2,
+   "yield_pct": 4.04,
+   "pe": 17.0,
+   "mdd_pct": -28.6
+  },
+  {
+   "sid": "2412",
+   "name": "中華電",
+   "industry": "電信",
+   "score": 79.6,
+   "yield_pct": 3.57,
+   "pe": 28.6,
+   "mdd_pct": -18.9
+  },
+  {
+   "sid": "2890",
+   "name": "永豐金",
+   "industry": "金融",
+   "score": 78.1,
+   "yield_pct": 2.98,
+   "pe": 16.5,
+   "mdd_pct": -29.9
+  },
+  {
+   "sid": "4904",
+   "name": "遠傳",
+   "industry": "電信",
+   "score": 77.5,
+   "yield_pct": 3.63,
+   "pe": 25.6,
+   "mdd_pct": -25.6
+  },
+  {
+   "sid": "2891",
+   "name": "中信金",
+   "industry": "金融",
+   "score": 76.9,
+   "yield_pct": 3.68,
+   "pe": 16.2,
+   "mdd_pct": -36.0
+  },
+  {
+   "sid": "4938",
+   "name": "和碩",
+   "industry": "電子零組件",
+   "score": 72.0,
+   "yield_pct": 4.45,
+   "pe": 15.2,
+   "mdd_pct": -43.1
+  },
+  {
+   "sid": "2382",
+   "name": "廣達",
+   "industry": "電子零組件",
+   "score": 71.5,
+   "yield_pct": 4.67,
+   "pe": 14.6,
+   "mdd_pct": -47.7
+  },
+  {
+   "sid": "2317",
+   "name": "鴻海",
+   "industry": "電子零組件",
+   "score": 66.3,
+   "yield_pct": 2.82,
+   "pe": 16.7,
+   "mdd_pct": -50.3
+  },
+  {
+   "sid": "2356",
+   "name": "英業達",
+   "industry": "電子零組件",
+   "score": 64.8,
+   "yield_pct": 3.35,
+   "pe": 19.3,
+   "mdd_pct": -52.9
+  },
+  {
+   "sid": "2330",
+   "name": "台積電",
+   "industry": "半導體",
+   "score": 56.4,
+   "yield_pct": 0.88,
+   "pe": 29.1,
+   "mdd_pct": -45.7
+  }
+ ],
+ "volume": {
+  "buckets": [
+   {
+    "bucket": "① <0.7 極縮",
+    "n": 50930,
+    "same_day_pct": -0.007,
+    "next_day_pct": 0.044,
+    "fwd5_pct": 0.263,
+    "fwd20_pct": 1.024,
+    "win20_pct": 52.5,
+    "excess20_pct": -0.223,
+    "excess_win_pct": 44.6
+   },
+   {
+    "bucket": "② 0.7–1.0",
+    "n": 36519,
+    "same_day_pct": -0.03,
+    "next_day_pct": 0.041,
+    "fwd5_pct": 0.25,
+    "fwd20_pct": 1.076,
+    "win20_pct": 53.0,
+    "excess20_pct": -0.279,
+    "excess_win_pct": 44.7
+   },
+   {
+    "bucket": "③ 1.0–1.5",
+    "n": 30872,
+    "same_day_pct": 0.01,
+    "next_day_pct": 0.095,
+    "fwd5_pct": 0.293,
+    "fwd20_pct": 1.204,
+    "win20_pct": 53.2,
+    "excess20_pct": -0.183,
+    "excess_win_pct": 44.3
+   },
+   {
+    "bucket": "④ 1.5–2.0",
+    "n": 11531,
+    "same_day_pct": 0.097,
+    "next_day_pct": 0.048,
+    "fwd5_pct": 0.202,
+    "fwd20_pct": 1.106,
+    "win20_pct": 50.9,
+    "excess20_pct": -0.344,
+    "excess_win_pct": 42.4
+   },
+   {
+    "bucket": "⑤ 2.0–3.0",
+    "n": 7356,
+    "same_day_pct": 0.379,
+    "next_day_pct": 0.028,
+    "fwd5_pct": 0.203,
+    "fwd20_pct": 1.028,
+    "win20_pct": 50.4,
+    "excess20_pct": -0.476,
+    "excess_win_pct": 41.3
+   },
+   {
+    "bucket": "⑥ >3.0 爆量",
+    "n": 3922,
+    "same_day_pct": 1.287,
+    "next_day_pct": 0.059,
+    "fwd5_pct": 0.572,
+    "fwd20_pct": 1.179,
+    "win20_pct": 50.8,
+    "excess20_pct": -0.279,
+    "excess_win_pct": 42.1
+   }
+  ],
+  "quadrants": [
+   {
+    "quad": "量增／價漲",
+    "n": 11823,
+    "fwd5_pct": 0.25,
+    "fwd20_pct": 1.168,
+    "win20_pct": 48.9,
+    "fwd20_vol_pct": 30.9,
+    "excess20_pct": -0.222
+   },
+   {
+    "quad": "量增／價跌",
+    "n": 10986,
+    "fwd5_pct": 0.283,
+    "fwd20_pct": 1.013,
+    "win20_pct": 52.8,
+    "fwd20_vol_pct": 26.6,
+    "excess20_pct": -0.541
+   },
+   {
+    "quad": "量平縮／價漲",
+    "n": 52962,
+    "fwd5_pct": 0.271,
+    "fwd20_pct": 1.074,
+    "win20_pct": 52.4,
+    "fwd20_vol_pct": 26.4,
+    "excess20_pct": -0.21
+   },
+   {
+    "quad": "量平縮／價跌",
+    "n": 65359,
+    "fwd5_pct": 0.263,
+    "fwd20_pct": 1.097,
+    "win20_pct": 53.1,
+    "fwd20_vol_pct": 25.9,
+    "excess20_pct": -0.246
+   }
+  ],
+  "interaction": [
+   {
+    "cond": "平量／站上MA20",
+    "n": 59364,
+    "fwd20_pct": 0.993,
+    "excess20_pct": -0.223,
+    "excess_win_pct": 44.0
+   },
+   {
+    "cond": "平量／跌破MA20",
+    "n": 58957,
+    "fwd20_pct": 1.181,
+    "excess20_pct": -0.237,
+    "excess_win_pct": 45.0
+   },
+   {
+    "cond": "放量／站上MA20",
+    "n": 14083,
+    "fwd20_pct": 0.895,
+    "excess20_pct": -0.392,
+    "excess_win_pct": 40.9
+   },
+   {
+    "cond": "放量／跌破MA20",
+    "n": 8726,
+    "fwd20_pct": 1.414,
+    "excess20_pct": -0.349,
+    "excess_win_pct": 43.8
+   }
+  ],
+  "group_rvol": [
+   {
+    "group": "DEF",
+    "n": 58450,
+    "avg_rvol": 1.12,
+    "gt2_pct": 8.0,
+    "gt3_pct": 2.7
+   },
+   {
+    "group": "MID",
+    "n": 76315,
+    "avg_rvol": 1.06,
+    "gt2_pct": 7.8,
+    "gt3_pct": 2.7
+   },
+   {
+    "group": "HYPE",
+    "n": 6365,
+    "avg_rvol": 1.07,
+    "gt2_pct": 10.0,
+    "gt3_pct": 3.7
+   }
+  ],
+  "benchmark": "同池 111 檔等權含息報酬（非 TAIEX），超額＝個股20日報酬 − 等權20日報酬",
+  "note": "量比＝當日成交量(張)/前20日均量；無流通股數，非真實換手率。分組為描述性統計，20日視窗重疊，非策略績效。"
+ },
+ "structure": {
+  "n_days": 1312,
+  "states": [
+   {
+    "state": "指數主導",
+    "n": 223,
+    "pct": 17.0,
+    "avg_abs_index_pct": 2.42,
+    "avg_up_pct": 44.0,
+    "avg_spread_pp": 6.18,
+    "avg_ind_gap_pp": 4.61,
+    "avg_share_mkt": 0.59,
+    "avg_share_ind": 0.16,
+    "avg_share_idio": 0.25
+   },
+   {
+    "state": "產業主導",
+    "n": 55,
+    "pct": 4.2,
+    "avg_abs_index_pct": 0.71,
+    "avg_up_pct": 49.9,
+    "avg_spread_pp": 6.5,
+    "avg_ind_gap_pp": 7.39,
+    "avg_share_mkt": 0.11,
+    "avg_share_ind": 0.53,
+    "avg_share_idio": 0.35
+   },
+   {
+    "state": "個股主導",
+    "n": 1034,
+    "pct": 78.8,
+    "avg_abs_index_pct": 0.62,
+    "avg_up_pct": 46.0,
+    "avg_spread_pp": 5.13,
+    "avg_ind_gap_pp": 3.81,
+    "avg_share_mkt": 0.14,
+    "avg_share_ind": 0.27,
+    "avg_share_idio": 0.59
+   }
+  ],
+  "segments": [
+   {
+    "label": "2021/06–2022/07 慢熊",
+    "dir": "空頭",
+    "n": 269,
+    "指數主導_pct": 13.0,
+    "產業主導_pct": 8.2,
+    "個股主導_pct": 78.8,
+    "avg_up_pct": 45.1,
+    "avg_ind_gap_pp": 4.34
+   },
+   {
+    "label": "2022/07–2022/10 空頭",
+    "dir": "空頭",
+    "n": 78,
+    "指數主導_pct": 23.1,
+    "產業主導_pct": 1.3,
+    "個股主導_pct": 75.6,
+    "avg_up_pct": 44.1,
+    "avg_ind_gap_pp": 4.09
+   },
+   {
+    "label": "2022/10–2024/07 多頭一",
+    "dir": "多頭",
+    "n": 414,
+    "指數主導_pct": 10.6,
+    "產業主導_pct": 1.9,
+    "個股主導_pct": 87.4,
+    "avg_up_pct": 47.1,
+    "avg_ind_gap_pp": 3.62
+   },
+   {
+    "label": "2024/07–2025/02 震盪",
+    "dir": "空頭",
+    "n": 147,
+    "指數主導_pct": 22.4,
+    "產業主導_pct": 6.1,
+    "個股主導_pct": 71.4,
+    "avg_up_pct": 44.7,
+    "avg_ind_gap_pp": 3.66
+   },
+   {
+    "label": "2025/02–2025/04 急殺",
+    "dir": "空頭",
+    "n": 31,
+    "指數主導_pct": 25.8,
+    "產業主導_pct": 3.2,
+    "個股主導_pct": 71.0,
+    "avg_up_pct": 39.8,
+    "avg_ind_gap_pp": 3.84
+   },
+   {
+    "label": "2025/04–2026/10 多頭二",
+    "dir": "多頭",
+    "n": 378,
+    "指數主導_pct": 23.3,
+    "產業主導_pct": 3.7,
+    "個股主導_pct": 73.0,
+    "avg_up_pct": 46.0,
+    "avg_ind_gap_pp": 4.64
+   }
+  ],
+  "breadth": [
+   {
+    "label": "齊跌（上漲檔<20%）",
+    "n": 151,
+    "pct": 11.5,
+    "avg_index_pct": -1.73,
+    "avg_abs_index_pct": 1.74,
+    "avg_ind_gap_pp": 4.26,
+    "avg_spread_pp": 5.4,
+    "avg_share_mkt": 0.42,
+    "avg_share_ind": 0.2,
+    "avg_share_idio": 0.38
+   },
+   {
+    "label": "分歧（20–80%）",
+    "n": 1099,
+    "pct": 83.8,
+    "avg_index_pct": 0.22,
+    "avg_abs_index_pct": 0.75,
+    "avg_ind_gap_pp": 4.05,
+    "avg_spread_pp": 5.33,
+    "avg_share_mkt": 0.18,
+    "avg_share_ind": 0.27,
+    "avg_share_idio": 0.55
+   },
+   {
+    "label": "齊漲（上漲檔≥80%）",
+    "n": 62,
+    "pct": 4.7,
+    "avg_index_pct": 2.11,
+    "avg_abs_index_pct": 2.11,
+    "avg_ind_gap_pp": 4.45,
+    "avg_spread_pp": 6.04,
+    "avg_share_mkt": 0.49,
+    "avg_share_ind": 0.18,
+    "avg_share_idio": 0.33
+   }
+  ],
+  "crash_breadth": {
+   "n_days": 31,
+   "down80_n": 5,
+   "down50_n": 21,
+   "avg_up_pct": 39.8,
+   "avg_ind_gap_pp": 3.84
+  },
+  "examples": {
+   "指數主導_大跌": [
+    {
+     "date": 20250407,
+     "index_pct": -9.7,
+     "up_pct": 1.8,
+     "spread_pp": 5.38,
+     "ind_gap_pp": 6.22,
+     "ind_hi": "天然氣",
+     "ind_hi_pct": -3.72,
+     "ind_lo": "紡織",
+     "ind_lo_pct": -9.94
+    },
+    {
+     "date": 20240805,
+     "index_pct": -8.35,
+     "up_pct": 1.8,
+     "spread_pp": 8.76,
+     "ind_gap_pp": 9.06,
+     "ind_hi": "電信",
+     "ind_hi_pct": -0.25,
+     "ind_lo": "電子零組件",
+     "ind_lo_pct": -9.32
+    },
+    {
+     "date": 20260717,
+     "index_pct": -6.47,
+     "up_pct": 18.9,
+     "spread_pp": 11.49,
+     "ind_gap_pp": 8.87,
+     "ind_hi": "電信",
+     "ind_hi_pct": 1.3,
+     "ind_lo": "半導體",
+     "ind_lo_pct": -7.57
+    },
+    {
+     "date": 20250409,
+     "index_pct": -5.79,
+     "up_pct": 2.7,
+     "spread_pp": 9.64,
+     "ind_gap_pp": 9.36,
+     "ind_hi": "電信",
+     "ind_hi_pct": -0.35,
+     "ind_lo": "航運",
+     "ind_lo_pct": -9.72
+    },
+    {
+     "date": 20260728,
+     "index_pct": -4.65,
+     "up_pct": 15.3,
+     "spread_pp": 10.83,
+     "ind_gap_pp": 8.68,
+     "ind_hi": "水泥",
+     "ind_hi_pct": 0.45,
+     "ind_lo": "半導體",
+     "ind_lo_pct": -8.23
+    }
+   ],
+   "指數主導_大漲": [
+    {
+     "date": 20250410,
+     "index_pct": 9.25,
+     "up_pct": 100.0,
+     "spread_pp": 7.11,
+     "ind_gap_pp": 7.22,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 9.93,
+     "ind_lo": "天然氣",
+     "ind_lo_pct": 2.71
+    },
+    {
+     "date": 20260731,
+     "index_pct": 7.98,
+     "up_pct": 63.1,
+     "spread_pp": 12.03,
+     "ind_gap_pp": 9.06,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 7.87,
+     "ind_lo": "食品",
+     "ind_lo_pct": -1.19
+    },
+    {
+     "date": 20260408,
+     "index_pct": 4.61,
+     "up_pct": 73.9,
+     "spread_pp": 9.9,
+     "ind_gap_pp": 9.41,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 6.19,
+     "ind_lo": "塑化",
+     "ind_lo_pct": -3.22
+    },
+    {
+     "date": 20260401,
+     "index_pct": 4.58,
+     "up_pct": 89.2,
+     "spread_pp": 8.1,
+     "ind_gap_pp": 3.91,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 4.21,
+     "ind_lo": "天然氣",
+     "ind_lo_pct": 0.3
+    },
+    {
+     "date": 20260504,
+     "index_pct": 4.57,
+     "up_pct": 47.7,
+     "spread_pp": 9.2,
+     "ind_gap_pp": 8.08,
+     "ind_hi": "電機",
+     "ind_hi_pct": 4.28,
+     "ind_lo": "塑化",
+     "ind_lo_pct": -3.8
+    }
+   ],
+   "產業主導_差距最大": [
+    {
+     "date": 20260310,
+     "index_pct": 2.06,
+     "up_pct": 64.0,
+     "spread_pp": 9.8,
+     "ind_gap_pp": 13.16,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 3.2,
+     "ind_lo": "天然氣",
+     "ind_lo_pct": -9.96
+    },
+    {
+     "date": 20210621,
+     "index_pct": -1.48,
+     "up_pct": 27.0,
+     "spread_pp": 9.28,
+     "ind_gap_pp": 10.87,
+     "ind_hi": "航運",
+     "ind_hi_pct": 8.87,
+     "ind_lo": "生技醫療",
+     "ind_lo_pct": -1.99
+    },
+    {
+     "date": 20210623,
+     "index_pct": 1.53,
+     "up_pct": 74.8,
+     "spread_pp": 6.03,
+     "ind_gap_pp": 10.55,
+     "ind_hi": "汽車",
+     "ind_hi_pct": 2.49,
+     "ind_lo": "航運",
+     "ind_lo_pct": -8.06
+    },
+    {
+     "date": 20250904,
+     "index_pct": 0.33,
+     "up_pct": 78.4,
+     "spread_pp": 7.55,
+     "ind_gap_pp": 10.32,
+     "ind_hi": "營造",
+     "ind_hi_pct": 8.1,
+     "ind_lo": "生技醫療",
+     "ind_lo_pct": -2.22
+    },
+    {
+     "date": 20210721,
+     "index_pct": -0.4,
+     "up_pct": 43.2,
+     "spread_pp": 6.65,
+     "ind_gap_pp": 10.12,
+     "ind_hi": "生技醫療",
+     "ind_hi_pct": 3.28,
+     "ind_lo": "航運",
+     "ind_lo_pct": -6.84
+    }
+   ],
+   "個股主導_離散最大": [
+    {
+     "date": 20250408,
+     "index_pct": -4.02,
+     "up_pct": 32.4,
+     "spread_pp": 15.49,
+     "ind_gap_pp": 11.73,
+     "ind_hi": "食品",
+     "ind_hi_pct": 3.3,
+     "ind_lo": "電子零組件",
+     "ind_lo_pct": -8.43
+    },
+    {
+     "date": 20220701,
+     "index_pct": -3.26,
+     "up_pct": 42.3,
+     "spread_pp": 14.68,
+     "ind_gap_pp": 8.29,
+     "ind_hi": "電信",
+     "ind_hi_pct": 4.24,
+     "ind_lo": "航運",
+     "ind_lo_pct": -4.06
+    },
+    {
+     "date": 20250411,
+     "index_pct": 2.78,
+     "up_pct": 61.3,
+     "spread_pp": 12.48,
+     "ind_gap_pp": 8.65,
+     "ind_hi": "航運",
+     "ind_hi_pct": 7.51,
+     "ind_lo": "營造",
+     "ind_lo_pct": -1.14
+    },
+    {
+     "date": 20260803,
+     "index_pct": 0.62,
+     "up_pct": 60.4,
+     "spread_pp": 12.18,
+     "ind_gap_pp": 5.37,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 4.23,
+     "ind_lo": "汽車",
+     "ind_lo_pct": -1.13
+    },
+    {
+     "date": 20260511,
+     "index_pct": 0.45,
+     "up_pct": 54.1,
+     "spread_pp": 11.84,
+     "ind_gap_pp": 4.88,
+     "ind_hi": "半導體",
+     "ind_hi_pct": 3.94,
+     "ind_lo": "生技醫療",
+     "ind_lo_pct": -0.95
+    }
+   ]
+  },
+  "forward_index": [
+   {
+    "state": "指數主導",
+    "fwd5_index_pct": 0.95,
+    "fwd20_index_pct": 2.46,
+    "fwd20_win_pct": 64.8
+   },
+   {
+    "state": "產業主導",
+    "fwd5_index_pct": 1.14,
+    "fwd20_index_pct": 2.42,
+    "fwd20_win_pct": 67.3
+   },
+   {
+    "state": "個股主導",
+    "fwd5_index_pct": 0.29,
+    "fwd20_index_pct": 1.58,
+    "fwd20_win_pct": 62.6
+   }
+  ],
+  "note": "事後橫截面分解：market=|指數報酬|、between=產業平均報酬的橫截面標準差、within=產業內標準差均值；以平方占比判主導。不用於預測隔日。"
+ }
+}

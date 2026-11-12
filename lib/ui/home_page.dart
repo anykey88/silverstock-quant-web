@@ -35,6 +35,7 @@ import 'strategy_page.dart';
 import 'theme.dart';
 import 'trade_result_page.dart';
 import 'widgets.dart';
+import 'data_freshness_banner.dart'; // V2.8 雙時間・三態標籤・資料時效總覽
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -368,6 +369,8 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               _header(),
+                              const SizedBox(height: 6),
+                              const DataFreshnessBanner(), // V2.8：先講清楚資料有多新
                               const SizedBox(height: 6),
                               if (AppModeController.instance.isPersonal)
                                 _toolsCard(),

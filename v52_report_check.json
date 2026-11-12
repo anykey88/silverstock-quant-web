@@ -1,0 +1,112 @@
+{
+  "version": "V5.2",
+  "generated_at": "2026-11-11",
+  "purpose": "沿用 V5.1 七項體檢口徑檢查本輪新增報告；不改原體檢程式。",
+  "standard": "與 V5.1 完全相同，沒有放寬；技術版保留代號故該項不適用。",
+  "check_names": [
+    "簡體字殘留",
+    "長輩版術語洩漏",
+    "標籤被當文字印出",
+    "負號寫法不一致",
+    "章節跳號",
+    "標籤沒閉合",
+    "舊說法殘留／來源讀不到"
+  ],
+  "source_results_readable": {
+    "v52_step2_freshness.json": true,
+    "v52_step3_ablation.json": true,
+    "v52_step4_daily_nav.json": true,
+    "v52_step5_multifold.json": true
+  },
+  "n_files": 2,
+  "n_checks": 14,
+  "n_fail": 0,
+  "n_not_applicable": 2,
+  "all_pass": true,
+  "html": {
+    "file": "V5.2_施工單編程結果.html",
+    "exists": true,
+    "checks": [
+      {
+        "name": "簡體字殘留",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "長輩版術語洩漏",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "標籤被當文字印出",
+        "ok": true,
+        "note": "0 處"
+      },
+      {
+        "name": "負號寫法不一致",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "章節跳號",
+        "ok": true,
+        "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+      },
+      {
+        "name": "標籤沒閉合",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "舊說法殘留／來源讀不到",
+        "ok": true,
+        "note": "乾淨且來源可讀"
+      }
+    ],
+    "passed": true,
+    "na": 0
+  },
+  "md": {
+    "file": "V5.2_施工單編程結果決策卡.md",
+    "exists": true,
+    "checks": [
+      {
+        "name": "簡體字殘留",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "長輩版術語洩漏",
+        "ok": true,
+        "note": "技術版保留代號，不適用"
+      },
+      {
+        "name": "標籤被當文字印出",
+        "ok": true,
+        "note": "0 處"
+      },
+      {
+        "name": "負號寫法不一致",
+        "ok": true,
+        "note": "乾淨"
+      },
+      {
+        "name": "章節跳號",
+        "ok": true,
+        "note": "抓到 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]／應為 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+      },
+      {
+        "name": "標籤沒閉合",
+        "ok": true,
+        "note": "純文字，不適用"
+      },
+      {
+        "name": "舊說法殘留／來源讀不到",
+        "ok": true,
+        "note": "乾淨且來源可讀"
+      }
+    ],
+    "passed": true,
+    "na": 2
+  }
+}
